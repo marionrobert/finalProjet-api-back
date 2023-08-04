@@ -3,5 +3,5 @@ const withAuth = require("../withAuth")
 const adminAuth = require("../adminAuth")
 
 module.exports = (app, db) => {
-  const activityModel = require("../models/ActivityModel")
+  const activityModel = require("../models/ActivityModel")(db)
 }
