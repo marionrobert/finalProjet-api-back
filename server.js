@@ -38,6 +38,7 @@ const password = process.env.PASSWORD || config.db.password
 //importation des routes
 const userRoutes = require("./routes/userRoutes")
 const authRoutes = require("./routes/authRoutes")
+const categoryRoutes = require("./routes/categoryRoutes")
 const activityRoutes = require("./routes/activityRoutes")
 const bookingRoutes = require("./routes/bookingRoutes")
 const commentRoutes = require("./routes/commentRoutes")
@@ -62,6 +63,7 @@ mysql.createConnection({
   //appel des routes
   userRoutes(app, db)
   authRoutes(app, db)
+  categoryRoutes(app, db)
   activityRoutes(app, db)
   bookingRoutes(app, db)
   commentRoutes(app, db)
