@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
-const secret = "pbio8451*$"
+const secret = process.env.SECRET
+// console.log("secret from withAuth-->", secret)
 
 const withAuth = (req, res, next) => {
     //on récupère notre token dans le header de la requète HTTP

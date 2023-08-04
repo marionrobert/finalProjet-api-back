@@ -1,6 +1,7 @@
 const withAuth = require("../withAuth")
 const jwt = require("jsonwebtoken")
-const secret = "pbio8451*$"
+const secret = process.env.SECRET
+// console.log("secret from adminRoutes-->", secret)
 
 // route permettant la gestion de la connexion par token (avec le front qui jouera avec redux)
 module.exports = (app, db)=>{

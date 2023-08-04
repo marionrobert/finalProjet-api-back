@@ -3,7 +3,8 @@ const saltRounds = 10
 
 // librairie qui va générer un token de connexion
 const jwt = require("jsonwebtoken")
-const secret = "pbio8451*$"
+const secret = process.env.SECRET
+// console.log("secret from userRoutes -->", secret)
 const withAuth = require("../withAuth")
 
 module.exports = (app, db) => {

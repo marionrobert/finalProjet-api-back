@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
-const secret = "pbio8451*$"
-// const secret = require("../.env")
+const secret = process.env.SECRET
+// console.log("secret from amdinAuth-->", secret)
 
 const adminAuth = (req, res, next) => {
     //on récupère notre token dans le header de la requète HTTP
