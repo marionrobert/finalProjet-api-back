@@ -19,6 +19,9 @@ app.use(express.urlencoded({extended: false}))
 app.use(express.json())
 app.use(express.static(__dirname+"/public"))
 
+app.set('views', './views');
+app.set('view engine', 'ejs');
+
 let config;
 // vérification l'api est en ligne (sur un server) ou non et on décide quelle bdd on va utiliser.
 if (!process.env.HOST){
