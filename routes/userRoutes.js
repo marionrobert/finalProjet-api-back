@@ -66,6 +66,8 @@ module.exports = (app, db) => {
     }
   })
 
+  
+
   // //route de modification des utilisateurs
   // app.put("/api/v1/user/update/:id", withAuth, async(req, res, next)=>{
   //   if (isNaN(req.params.id)){
