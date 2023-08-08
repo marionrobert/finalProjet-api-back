@@ -134,14 +134,14 @@ class UserModel {
     })
   }
 
-  static async updatePict(url, key_id){
-    return db.query("UPDATE users SET url = ? WHERE key_id = ?", [url, key_id])
+  static async updateAvatar(avatar, key_id){
+    return db.query("UPDATE users SET avatar = ? WHERE key_id = ?", [avatar, key_id])
     .then((res)=>{
-      console.log("res de requête sql updatePict -->", res)
+      console.log("res de requête sql updateAvatar -->", res)
       return res
     })
     .catch((err)=>{
-      console.log("err de requête sql updatePict -->", err)
+      console.log("err de requête sql updateAvatar -->", err)
       return err
     })
   }

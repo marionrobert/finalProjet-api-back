@@ -161,14 +161,14 @@ module.exports = (app, db) => {
       } else {
           res.json({status: 200, msg: "Les informations de l'utilisateur ont bien été mises à jour.", user:newUser[0]})
       }
-    }""
+    }
   })
 
   // route de modification de la photo de profil
-  app.put("/api/v1/user/updatePict/:key_id", withAuth, async(req, res, next)=>{
-    let changePict = await userModel.updatePict(req.body.url, req.params.key_id)
-    if (changePict.code){
-      res.json({status: 500, msg: "Erreur de modification de l'image de profil.", err: changePict})
+  app.put("/api/v1/user/update-avatar/:key_id", withAuth, async(req, res, next)=>{
+    let changeAvatar = await userModel.updateAvatar(req.body.avatar, req.params.key_id)
+    if (changeAvatar.code){
+      res.json({status: 500, msg: "Erreur de modification de l'image de profil.", err: changeAvatar})
     } else {
       let user = await userModel.getOneUser(req.params.key_id)
       if (user.code){
@@ -180,7 +180,7 @@ module.exports = (app, db) => {
           firstName: user[0].firstName,
           lastName: user[0].lastName,
           role: user[0].role,
-          url: user[0].url,
+          avatar: user[0].avatar,
           key_id: user[0].key_id
         }
         res.json({status: 200, msg: "Image de profil modifiée.", user: myUser })
@@ -199,7 +199,7 @@ module.exports = (app, db) => {
         firstName: user[0].firstName,
         lastName: user[0].lastName,
         role: user[0].role,
-        url: user[0].url,
+        avatar: user[0].avatar,
         key_id: user[0].key_id
       }
       res.json({status: 200, msg: "User récupéré.", user: myUser })
