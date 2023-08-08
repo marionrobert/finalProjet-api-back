@@ -18,9 +18,9 @@ class ActivityModel {
     })
   }
 
-
   //récupération de toutes les activités "en ligne"
   static async getAllOnlineActivities(){
+    console.log("hello from getAllOnelineActivities")
     return db.query("SELECT * FROM activities WHERE status=?", ["en ligne"])
     .then((res)=>{
       console.log("res de la requête sql getAllOnlineActivities -->", res)
@@ -74,8 +74,8 @@ class ActivityModel {
 
   //création d'une activité
   static async saveOneActivity(req){
-    let sql = "INSERT INTO `activities` (category_id`, `author_id`, `author_is_provider`, `title`, `description`, `address`, `zip`, `city`, `lat`, `lng`, `status`, `duration`, `points`, `picture`,`creationTimestamps`, `updatingTimestamps`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?, Now(), Now())"
-    return db.query(sql, [req.body.category_id, req.body.author_id, req.body.author_is_provider, req.body.title, req.body.description, req.body.address, req.body.zip, req.body.city, req.body.lat, req.body.lng, "en attente de validation", req.body.duration, req.body.points, req.body.picture])
+    let sql = "INSERT INTO activities (category_id, author_id, authorIsProvider, title, description, address, zip, city, lat, lng, status, duration, points, urlPicture, creationTimestamps, updatingTimestamps) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?, ?, Now(), Now())"
+    return db.query(sql, [req.body.category_id, req.body.author_id, req.body.authorIsProvider, req.body.title, req.body.description, req.body.address, req.body.zip, req.body.city, req.body.lat, req.body.lng, "en attente de validation", req.body.duration, req.body.points, req.body.urlPicture])
     .then((res)=>{
       console.log("res de la requête sql saveOneActivity -->", res)
       return res
@@ -88,8 +88,8 @@ class ActivityModel {
 
   //modification d'une activité
   static async updateOneActivity(req, id){
-    let sql = "UPDATE activities SET title=?, description=?, address=?, zip=?, city=?, lat=?, lng=?, status=?, duration=?, points=?, picture=?, updatingTimestamps=? WHERE id=?"
-    return db.query(sql, [ req.body.title, req.body.description, req.body.address, req.body.zip, req.body.city, req.body.lat, req.body.lng, "en attente de validation", req.body.duration, req.body.points, req.body.picture, new Date(), id])
+    let sql = "UPDATE activities SET title=?, description=?, address=?, zip=?, city=?, lat=?, lng=?, status=?, duration=?, points=?, urlPicture=?, updatingTimestamps=? WHERE id=?"
+    return db.query(sql, [ req.body.title, req.body.description, req.body.address, req.body.zip, req.body.city, req.body.lat, req.body.lng, "en attente de validation", req.body.duration, req.body.points, req.body.urlPicture, new Date(), id])
     .then((res)=>{
       console.log("res de la requête sql updateOneActivity -->", res)
       return res
@@ -139,6 +139,7 @@ class ActivityModel {
     })
   }
 
+  // filter les activités
   static async getActivitiesByFilter(req){
     let condition = " WHERE status='en ligne'"
     console.log("req dans getActivitiesByFilter -->", req)
@@ -168,7 +169,7 @@ class ActivityModel {
 
 
     //requête de récupération d'activités par rapport aux filtres sélectionnés et à la position de l'utilisateur et sur un rayon autour de lui
-    let sql = "SELECT id, category_id, author_id, author_is_provider, title, description, address, zip, city, lat, lng, status, duration, picture, points, creationTimestamps, updatingTimestamps,  st_distance(POINT(?,?), POINT( lat,lng))*100 AS distance FROM activities "+condition+" HAVING distance < ? ORDER BY distance";
+    let sql = "SELECT id, category_id, author_id, authorIsProvider, title, description, address, zip, city, lat, lng, status, duration, urlPicture, points, creationTimestamps, updatingTimestamps,  st_distance(POINT(?,?), POINT( lat,lng))*100 AS distance FROM activities "+condition+" HAVING distance < ? ORDER BY distance";
     return db.query(sql, [parseFloat(req.body.lat), parseFloat(req.body.lng), distance])
       .then((res)=>{
         console.log("res de la requête sql getActivitiesByFilter -->", res)

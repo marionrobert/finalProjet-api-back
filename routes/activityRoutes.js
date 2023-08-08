@@ -22,6 +22,7 @@ module.exports = (app, db) => {
 
   //route pour récupérer toutes les activités "en ligne" (route non protégée --> accueil)
   app.get("/api/v1/activity/all/online", async(req, res, next)=>{
+    console.log("hello from /api/v1/activity/all/online route")
     let activities = await activityModel.getAllOnlineActivities()
     if (activities.code){
       res.json({status: 500, msg: "Erreur de récupération des activités en ligne.", err: activities})
@@ -60,7 +61,7 @@ module.exports = (app, db) => {
         if (activities.length === 0){
           res.json({status: 401, msg: "L'auteur n'a pas encore créé d'activité.", activities: activities})
         } else {
-          res.json({status: 200, msg: "Les activités de l'auteuront bien été récupérées.", activities: activities})
+          res.json({status: 200, msg: "Les activités de l'auteur ont bien été récupérées.", activities: activities})
         }
       }
     }
@@ -86,7 +87,8 @@ module.exports = (app, db) => {
 
   //routes de création d'une activité - route protégée
   app.post("/api/v1/activity/save", withAuth, async(req, res, next)=>{
-    let activity = await activityModel.saveOneActivity(req.body)
+    console.log("coucou in /api/v1/activity/save route")
+    let activity = await activityModel.saveOneActivity(req)
     if (activity.code){
       res.json({status: 500, msg: "Erreur de création d'une activité.", err: activity})
     } else {
@@ -99,7 +101,7 @@ module.exports = (app, db) => {
     if (isNaN(req.params.id)){
       res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
     } else {
-      let activity = await activityModel.updateOneActivity(req.body, req.params.id)
+      let activity = await activityModel.updateOneActivity(req, req.params.id)
       if (activity.code){
         res.json({status: 500, msg: "Erreur de mise à jour de l'activité.", err: activity})
       } else {
@@ -152,7 +154,7 @@ module.exports = (app, db) => {
 
   //route de récupération des activités correspond aux filters appliqués par l'utilisateur
   app.get("/api/v1/activtity/all/filter", async(req, res, next)=>{
-    let activities = await activityModel.getActivitiesByFilter(req.body)
+    let activities = await activityModel.getActivitiesByFilter(req)
     if (activities.code){
       res.json({status: 500, msg: "Erreyr de récupération des activités selon les filtres renseignés.", err: activities})
     } else {
