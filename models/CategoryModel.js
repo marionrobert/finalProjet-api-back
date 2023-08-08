@@ -31,9 +31,9 @@ class CategoryModel {
     })
   }
 
-  // récupérer l'id d'une catégorie
-  static async getOneCategoryByTitle(req){
-    return dbquery("SELECT * FROM categories WHERE title=?", [req.body.title])
+  // récupérer d'une catégorie par son titre
+  static async getOneCategoryByTitle(title){
+    return dbquery("SELECT * FROM categories WHERE title=?", [title])
     .then((res)=>{
       console.log("res de la requête sql getOneCategoryByTitle -->", res)
       return res
@@ -82,6 +82,4 @@ class CategoryModel {
       return err
     })
   }
-
-
 }
