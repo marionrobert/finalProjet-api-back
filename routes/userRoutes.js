@@ -92,16 +92,16 @@ module.exports = (app, db) => {
     if (user.code){
       // res.json({status: 500, msg:"La validation du compte n'a pas pu aboutir"})
       info = "Une erreur est survenue lors de la validation de votre compte. Veuillez recommencer ou contacter notre service client."
-      res.render("validation", {key_id: req.params.key_id, info})
+      res.render("validation", {info})
     } else {
-      info = "Félicitations, votre compte a bien été validé!"
-      res.render('validation', {key_id: req.params.key_id, info})
+      info = "Félicitations, votre compte a bien été validé! Vous pouvez désormais vous connecter"
+      res.render('validation', {info})
     }
   })
 
   //route de demande de récupération de mot de passe oublié
   app.post("/api/v1/user/forgotPassword", async(req, res, next)=>{
-    let user_existing = await userModel.getUserByEMail(req.body.email)
+    let user_existing = await userModel.getUserByEmail(req.body.email)
     if (user_existing.code){
       res.json({status: 500, msg: "Erreur de récupération de l'utilisateur.", err: user_existing })
     } else {
@@ -140,9 +140,9 @@ module.exports = (app, db) => {
     } else {
         let result = await userModel.updatepassword(req.body.password1, req.params.key_id)
         if(result.code){
-            info = "Le mot de passe n'a pas pu être modifié!"
+            info = "Le mot de passe n'a pas pu être modifié. Veuillez réessayer ou contacter le service client."
         } else {
-            info = "Le mot de passe a bien été modifié!"
+            info = "Le mot de passe a bien été modifié! Vous pouvez désormais vous connecter."
         }
     }
     res.render('forgot', {key_id: req.params.key_id, info})
