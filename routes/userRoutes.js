@@ -88,13 +88,13 @@ module.exports = (app, db) => {
   //route de validation d'un compte (par son key_id)
   app.get("/api/v1/user/validate/:key_id", async(req, res, next)=>{
     let info = null
-    let user = await userModel.validateAccount(req.params.key_id)
-    if (user.code){
+    let validation = await userModel.validateAccount(req.params.key_id)
+    if (validation.code){
       // res.json({status: 500, msg:"La validation du compte n'a pas pu aboutir"})
       info = "Une erreur est survenue lors de la validation de votre compte. Veuillez recommencer ou contacter notre service client."
       res.render("validation", {info})
     } else {
-      info = "Félicitations, votre compte a bien été validé! Vous pouvez désormais vous connecter"
+      info = "Félicitations, votre compte a bien été validé! Nous vous offrons 2 points de bienvenue! Vous pouvez désormais vous connecter."
       res.render('validation', {info})
     }
   })
