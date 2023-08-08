@@ -115,7 +115,7 @@ module.exports = (app, db) => {
     if (isNaN(req.params.id)){
       res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
     } else {
-      let activity = await activityModel.updateOnlineOfflineStatus(req.body, req.params.id)
+      let activity = await activityModel.updateOnlineOfflineStatus(req, req.params.id)
       if (activity.code){
         res.json({status: 500, msg: "Erreur de mise à jour du statut de l'activité.", err: activity})
       } else {
@@ -153,10 +153,10 @@ module.exports = (app, db) => {
   })
 
   //route de récupération des activités correspond aux filters appliqués par l'utilisateur
-  app.get("/api/v1/activtity/all/filter", async(req, res, next)=>{
+  app.get("/api/v1/activtity/all/filter", withAuth, async(req, res, next)=>{
     let activities = await activityModel.getActivitiesByFilter(req)
     if (activities.code){
-      res.json({status: 500, msg: "Erreyr de récupération des activités selon les filtres renseignés.", err: activities})
+      res.json({status: 500, msg: "Erreur de récupération des activités selon les filtres renseignés.", err: activities})
     } else {
       if (activities.length === 0){
         res.json({status: 401, msg: "Aucune activité ne correspond aux critères demandés."})
