@@ -3,4 +3,195 @@ module.exports = (_db)=>{
   return ActivityModel
 }
 
-class ActivityModel {}
+class ActivityModel {
+
+  //récupération de toutes les activités
+  static async getAllActivities(){
+    return db.query("SELECT * FROM activities")
+    .then((res)=>{
+      console.log("res de la requête sql getAllActivities -->", res)
+      return res
+    })
+    .catch((err)=>{
+      console.log("err de la requête sql getAllActivities -->", err)
+      return err
+    })
+  }
+
+  //récupération de toutes les activités "en ligne"
+  static async getAllOnlineActivities(){
+    console.log("hello from getAllOnelineActivities")
+    return db.query("SELECT * FROM activities WHERE status=?", ["en ligne"])
+    .then((res)=>{
+      console.log("res de la requête sql getAllOnlineActivities -->", res)
+      return res
+    })
+    .catch((err)=>{
+      console.log("err de la requête sql getAllOnlineActivities -->", err)
+      return err
+    })
+  }
+
+
+  //récupération de toutes les activités "en attente de validation"
+  static async getAllWaitingActivities(){
+    return db.query("SELECT * FROM activities WHERE status=?", ["en attente de validation"])
+    .then((res)=>{
+      console.log("res de la requête sql getAllWaitingActivities -->", res)
+      return res
+    })
+    .catch((err)=>{
+      console.log("err de la requête sql getAllWaitingActivities -->", err)
+      return err
+    })
+  }
+
+  //récupération de toutes les activités d'un user/author
+  static async getAllActivitiesByAuthor(author_id){
+    return db.query("SELECT * FROM activities WHERE author_id=?", [author_id])
+    .then((res)=>{
+      console.log("res de la requête sql getAllActivitiesByUser -->", res)
+      return res
+    })
+    .catch((err)=>{
+      console.log("err de la requête sql getAllActivitiesByUser -->", err)
+      return err
+    })
+  }
+
+  //récupération d'une activité
+  static async getOneActivity(id){
+    return db.query("SELECT * FROM activities WHERE id=?", [id])
+    .then((res)=>{
+      console.log("res de la requête sql getOneActivity -->", res)
+      return res
+    })
+    .catch((err)=>{
+      console.log("err de la requête sql getOneActivity -->", err)
+      return err
+    })
+  }
+
+  //création d'une activité
+  static async saveOneActivity(req){
+    let sql = "INSERT INTO activities (category_id, author_id, authorIsProvider, title, description, address, zip, city, lat, lng, status, duration, points, urlPicture, creationTimestamps, updatingTimestamps) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?, ?, Now(), Now())"
+    return db.query(sql, [req.body.category_id, req.body.author_id, req.body.authorIsProvider, req.body.title, req.body.description, req.body.address, req.body.zip, req.body.city, req.body.lat, req.body.lng, "en attente de validation", req.body.duration, req.body.points, req.body.urlPicture])
+    .then((res)=>{
+      console.log("res de la requête sql saveOneActivity -->", res)
+      return res
+    })
+    .catch((err)=>{
+      console.log("err de la requête sql saveOneActivity -->", err)
+      return err
+    })
+  }
+
+  //modification d'une activité
+  static async updateOneActivity(req, id){
+    let sql = "UPDATE activities SET title=?, description=?, address=?, zip=?, city=?, lat=?, lng=?, status=?, duration=?, points=?, urlPicture=?, updatingTimestamps=? WHERE id=?"
+    return db.query(sql, [ req.body.title, req.body.description, req.body.address, req.body.zip, req.body.city, req.body.lat, req.body.lng, "en attente de validation", req.body.duration, req.body.points, req.body.urlPicture, new Date(), id])
+    .then((res)=>{
+      console.log("res de la requête sql updateOneActivity -->", res)
+      return res
+    })
+    .catch((err)=>{
+      console.log("err de la requête sql updateOneActivity -->", err)
+      return err
+    })
+  }
+
+  // mise à jour du statut d'une activité
+  static async updateOnlineOfflineStatus(req, id){
+    return db.query("UPDATE activities SET status=? WHERE id=?", [req.body.status, id])
+    .then((res)=>{
+      console.log("res de la requête sql updateOnlineOfflineStatus -->", res)
+      return res
+    })
+    .catch((err)=>{
+      console.log("err de la requête sql updateOnlineOfflineStatus -->", err)
+      return err
+    })
+  }
+
+  // validation d'une activité par l'administration (rôle modérateur)
+  static async validatePublicationForOneActivity(id){
+    return db.query("UPDATE activities SET status=? WHERE id=?", ["validée", id])
+    .then((res)=>{
+      console.log("res de la requête sql validatePublicationForOneActivity -->", res)
+      return res
+    })
+    .catch((err)=>{
+      console.log("err de la requête sql validatePublicationForOneActivity -->", err)
+      return err
+    })
+  }
+
+  // suppression d'une activité par son auteur
+  static async deleteOneActivity(id){
+    return db.query("DELETE FROM activities WHERE id=?", [id])
+    .then((res)=>{
+      console.log("res de la requête sql deleteOneActivity -->", res)
+      return res
+    })
+    .catch((err)=>{
+      console.log("err de la requête sql deleteOneActivity -->", err)
+      return err
+    })
+  }
+
+  // filter les activités
+  static async getActivitiesByFilter(req){
+    let condition = " WHERE status='en ligne'"
+    console.log("req dans getActivitiesByFilter -->", req)
+    // FORMAT DE LA REQUETE SQl A OBTENIR
+    // SELECT * FROM activities WHERE status = 'en ligne' AND category_id IN (2, 3, 7, 9) AND points BETWEEN min_points AND max_points AND duration BETWEEN min_duration AND max_duration;
+
+    //si l'utilisateur a choisi des catégories -- format d'un array contenant les id des catégories choisies
+    if(req.body.categories){
+      if (req.body.categories.length === 1) {
+        condition += ` AND category_id = ${req.body.categories[0]}`;
+      } else {
+        condition += ` AND category_id IN (${req.body.categories.join(', ')})`;
+      }
+    }
+
+    // si l'utilisateur a choisi une fourchette pour les points -- req.body.points = {min_points: 1, max_points: 3}
+    if(req.body.points){
+      condition += ` AND points BETWEEN ${req.body.points.min_points} AND ${req.body.points.max_points}`
+    }
+
+    // si l'utilisateur a choisi une fourchette pour la durée --> req.body.duration = {min_duration: 3, max_duration: 4}
+    if (req.body.duration){
+      condition += ` AND duration BETWEEN ${req.body.duration.min_duration} AND ${req.body.duration.max_duration}`
+    }
+
+    if (req.body.distance && req.body.lat && req.body.lng){
+      let distance = req.body.distance || 50;
+
+      //requête de récupération d'activités par rapport aux filtres sélectionnés et à la position de l'utilisateur et sur un rayon autour de lui
+      let sql = "SELECT id, category_id, author_id, authorIsProvider, title, description, address, zip, city, lat, lng, status, duration, urlPicture, points, creationTimestamps, updatingTimestamps,  st_distance(POINT(?,?), POINT( lat,lng))*100 AS distance FROM activities "+condition+" HAVING distance < ? ORDER BY distance";
+      return db.query(sql, [parseFloat(req.body.lat), parseFloat(req.body.lng), distance])
+        .then((res)=>{
+          console.log("res de la requête sql getActivitiesByFilter -->", res)
+          return res
+        })
+        .catch((err) => {
+          console.log("err de la requête sql getActivitiesByFilter -->", err)
+          return err
+        })
+    } else {
+      // Requête SQL sans la condition de distance
+      let sql = "SELECT id, category_id, author_id, authorIsProvider, title, description, address, zip, city, lat, lng, status, duration, urlPicture, points, creationTimestamps, updatingTimestamps FROM activities "+condition;
+      console.log('requête sql -->', sql)
+      return db.query(sql)
+        .then((res)=>{
+          console.log("res de la requête sql getActivitiesByFilter without distance -->", res)
+          return res
+        })
+        .catch((err) => {
+          console.log("err de la requête sql getActivitiesByFilter without distance -->", err)
+          return err
+        });
+    }
+  }
+}

@@ -28,3 +28,4 @@ config-offline.js
 config.js
 
 .env
+client_secret*

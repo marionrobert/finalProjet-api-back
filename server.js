@@ -19,6 +19,9 @@ app.use(express.urlencoded({extended: false}))
 app.use(express.json())
 app.use(express.static(__dirname+"/public"))
 
+app.set('views', './views');
+app.set('view engine', 'ejs');
+
 let config;
 // vérification l'api est en ligne (sur un server) ou non et on décide quelle bdd on va utiliser.
 if (!process.env.HOST){
@@ -38,6 +41,7 @@ const password = process.env.PASSWORD || config.db.password
 //importation des routes
 const userRoutes = require("./routes/userRoutes")
 const authRoutes = require("./routes/authRoutes")
+const categoryRoutes = require("./routes/categoryRoutes")
 const activityRoutes = require("./routes/activityRoutes")
 const bookingRoutes = require("./routes/bookingRoutes")
 const commentRoutes = require("./routes/commentRoutes")
@@ -62,6 +66,7 @@ mysql.createConnection({
   //appel des routes
   userRoutes(app, db)
   authRoutes(app, db)
+  categoryRoutes(app, db)
   activityRoutes(app, db)
   bookingRoutes(app, db)
   commentRoutes(app, db)

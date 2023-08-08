@@ -1,0 +1,14 @@
+<header>
+  <h1>Réinitialisation du mot de passe de votre compte Harmony</h1>
+</header>
+<main>
+  <h2>Entrez votre mot de passe 2 fois.</h2>
+  <% if(info !== null) { %>
+      <p><%= info %></p>
+  <% } %>
+  <form action="/api/v1/user/changePassword/<%=key_id%>" method="POST">
+      <input type="password" name="password1" placeholder="Entrez un nouveau mot de passe" />
+      <input type="password" name="password2" placeholder="Retapez-le à l'identique"/>
+      <input type="submit" value="envoyer" />
+  </form>
+</main>
