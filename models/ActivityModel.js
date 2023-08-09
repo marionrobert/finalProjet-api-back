@@ -194,4 +194,17 @@ class ActivityModel {
         });
     }
   }
+
+  // mise à jour de la catégorie des activités
+  static async updateActivitiesCategory(old_category_id, new_category_id){
+    return db.query("UPDATE activities SET category_id = ? WHERE category_id = ?", [new_category_id, old_category_id])
+    .then((res)=>{
+      console.log("res de la requête sql updateCategory -->", res)
+      return res
+    })
+    .catch((err)=>{
+      console.log("err de la requête sql updateCategory -->", err)
+      return err
+    })
+  }
 }
