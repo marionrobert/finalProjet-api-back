@@ -3,6 +3,7 @@ const adminAuth = require("../adminAuth")
 
 module.exports = (app, db) => {
   const categoryModel = require("../models/CategoryModel")(db)
+  const activityModel = require("../models/ActivityModel")
 
   //route de récupération de toutes les catégories - route admin
   app.get("/api/v1/category/all", adminAuth, async(req, res, next)=>{
@@ -60,36 +61,67 @@ module.exports = (app, db) => {
     }
   })
 
-  // route de mise à jour d'une catégorie
+  // route de mise à jour d'une catégorie, attention: la catégorie "Autres" doit rester intacte
   app.put("/api/v1/category/update/:id", adminAuth, async(req, res, next)=>{
     if (isNaN(req.params.id)){
       res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
     } else {
-      let category = await categoryModel.updateOneCategory(req.params.id)
-      if (category.code){
-        res.json({status: 500, msg: "Erreur de mise à jour de la catégorie.", err: category})
+      // vérifions qu'une catégorie "Autres" existe
+      let otherCategory = await categoryModel.getOneCategoryByTitle("Autres")
+      if (otherCategory.code || otherCategory.length === 0){
+        res.json({status: 500, msg: 'Erreur rencontrée dans le processus de modification de la catégorie.', err: otherCategory})
       } else {
-        res.json({status: 200, msg: "La catégorie a bien été mise à jour.", category: category})
+        console.log("otherCategory", otherCategory)
+        if (otherCategory[0].id === req.params.id){
+          // l'admin tenter de modifier la catégorie "Autres" --> elle doit rester intacte pour reclasser les activités rattachées à la catégorie qu'on souhaite supprimer
+          res.json({status: 500, msg: 'La catégorie "Autres" ne peut pas être modifiée.'})
+        } else {
+          let category = await categoryModel.updateOneCategory(req.params.id)
+          if (category.code){
+            res.json({status: 500, msg: "Erreur de mise à jour de la catégorie.", err: category})
+          } else {
+            res.json({status: 200, msg: "La catégorie a bien été mise à jour.", category: category})
+          }
+        }
       }
     }
   })
 
+
+  // route de suppression d'une catégorie qui n'est pas la catégorie "Autres"
   app.delete("/api/v1/category/delete/:id", adminAuth, async(req, res, next)=>{
     if (isNaN(req.params.id)){
       res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
     } else {
       // vérifions qu'une catégorie "Autres" existe
       let otherCategory = await categoryModel.getOneCategoryByTitle("Autres")
-      if (otherCategory.code){
+      if (otherCategory.code || otherCategory.length === 0){
+        //on ne peut pas procéder à la suppression car il n'y a pas de catégorie de secours pour reclasser les activités rattachées à la catégorie qu'on souhaite supprimer
         res.json({status: 500, msg: 'Erreur rencontrée dans le processus de suppression de la catégorie.', err: otherCategory})
       } else {
-        //console.log(otherCategory)
-        if (otherCategory.id === req.params.id){
-          // l'admin tenter de supprimer l'activité Autres
+        console.log("otherCategory", otherCategory)
+        if (otherCategory[0].id === req.params.id){
+          // l'admin tenter de supprimer la catégorie "Autres"
           res.json({status: 500, msg: 'La catégorie "Autres" ne peut pas être supprimée.'})
         } else {
-          //l'admin cherche à supprimer une autre activité
-
+          //l'admin cherche à supprimer une autre catégorie
+          let category = await categoryModel.deleteOneCategory(req.params.id)
+          if (category.code){
+            res.json({status: 500, msg: "Erreur dans la suppression de la catégorie.", err: category})
+          } else {
+            // chngmt de la catégorie de rattachement pour les activités
+            let activities = await activityModel.getAllActivitiesByCategoryId(req.params.id)
+            if (activities.code){
+              res.json({status: 500, msg: "Erreur de récupération des actviités associées à la catégorie supprimée.", err: activities})
+            } else {
+              let activities = await activityModel.updateActivitiesCategory(req.params.id, otherCategory[0].id)
+              if (activities.code){
+                res.json({status: 500, msg: 'Erreur dans le changement de la catégorie pour les activités attachées à la catégorie supprimée.', err: activities})
+              } else {
+                res.json({status: 200, msg: "La catégorie a été supprimée. Les activités associés ont été rangées dans la catégorie << Autres >>.", result: category, activities: activities})
+              }
+            }
+          }
         }
       }
     }
