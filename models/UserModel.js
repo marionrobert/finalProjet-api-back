@@ -111,7 +111,7 @@ class UserModel {
 
   }
 
-  //récupération d'un utilisateur par son id
+  //récupération d'un utilisateur par son key_id
   static getOneUser(key_id){
     return db.query("SELECT * FROM users WHERE key_id = ?", [key_id])
     .then((res)=>{
@@ -146,4 +146,15 @@ class UserModel {
     })
   }
 
+  static async updatePoints(points, id){
+    return db.query("UPDATE users SET points=? WHERE id=?", [points, id])
+    .then((res)=>{
+      console.log("res de requête sql updatePoints -->", res)
+      return res
+    })
+    .catch((err)=>{
+      console.log("err de requête sql updatePoints -->", err)
+      return err
+    })
+  }
 }
