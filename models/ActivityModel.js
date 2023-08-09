@@ -32,7 +32,6 @@ class ActivityModel {
     })
   }
 
-
   //récupération de toutes les activités "en attente de validation"
   static async getAllWaitingActivities(){
     return db.query("SELECT * FROM activities WHERE status=?", ["en attente de validation"])
@@ -55,6 +54,19 @@ class ActivityModel {
     })
     .catch((err)=>{
       console.log("err de la requête sql getAllActivitiesByUser -->", err)
+      return err
+    })
+  }
+
+  // récupérattion de toutes les activités selon  le statut de l'auteur de l'activité (author_is_provider: true/false)
+  static async getAllActivitiesByAuthorIsProvider(req){
+    return db.query("SELECT * FROM activities WHERE authorIsProvider=?", [req.body.authorIsProvider])
+    .then((res)=>{
+      console.log("res de la requête sql getAllActivitiesByAuthorIsProvider -->", res)
+      return res
+    })
+    .catch((err)=>{
+      console.log("err de la requête sql getAllActivitiesByAuthorIsProvider -->", err)
       return err
     })
   }
@@ -143,8 +155,7 @@ class ActivityModel {
   static async getActivitiesByFilter(req){
     let condition = " WHERE status='en ligne'"
     console.log("req dans getActivitiesByFilter -->", req)
-    // FORMAT DE LA REQUETE SQl A OBTENIR
-    // SELECT * FROM activities WHERE status = 'en ligne' AND category_id IN (2, 3, 7, 9) AND points BETWEEN min_points AND max_points AND duration BETWEEN min_duration AND max_duration;
+    // FORMAT DE LA REQUETE SQl A OBTENIR : SELECT * FROM activities WHERE status = 'en ligne' AND authorIsProvider = true/false AND category_id IN (2, 3, 7, 9) AND points BETWEEN min_points AND max_points AND duration BETWEEN min_duration AND max_duration;
 
     //si l'utilisateur a choisi des catégories -- format d'un array contenant les id des catégories choisies
     if(req.body.categories){
@@ -153,6 +164,11 @@ class ActivityModel {
       } else {
         condition += ` AND category_id IN (${req.body.categories.join(', ')})`;
       }
+    }
+
+    // si l'utilisateur a choisi s'il recherche des activités pour recevoir ou donner un coup de main
+    if (req.body.authorIsProvider){
+      condition += ` AND authorIsProvider = ${req.body.authorIsProvider}`
     }
 
     // si l'utilisateur a choisi une fourchette pour les points -- req.body.points = {min_points: 1, max_points: 3}
