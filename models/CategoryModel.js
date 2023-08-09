@@ -33,7 +33,7 @@ class CategoryModel {
 
   // récupérer d'une catégorie par son titre
   static async getOneCategoryByTitle(title){
-    return dbquery("SELECT * FROM categories WHERE title=?", [title])
+    return db.query("SELECT * FROM categories WHERE title=?", [title])
     .then((res)=>{
       console.log("res de la requête sql getOneCategoryByTitle -->", res)
       return res
@@ -44,9 +44,10 @@ class CategoryModel {
     })
   }
 
+
   //création d'une catégorie
   static async saveOneCategory(req){
-    return db.query("INSERT INTO categories (title), VALUES (?)", [req.body.title])
+    return db.query("INSERT INTO categories (title) VALUES (?)", [req.body.title])
     .then((res)=>{
       console.log("res de la requête sql saveOneCategory -->", res)
       return res
@@ -72,7 +73,7 @@ class CategoryModel {
 
   // suppression d'une catégorie
   static async deleteOneCategory(id){
-    return db.query("DELETE categories WHERE id=?", [id])
+    return db.query("DELETE FROM categories WHERE id=?", [id])
     .then((res)=>{
       console.log("res de la requête sql deleteOneCategory -->", res)
       return res

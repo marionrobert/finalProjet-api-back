@@ -195,18 +195,18 @@ class ActivityModel {
     }
   }
 
-  // récupération des activités par leur catégorie de rattachement
-  static async getAllActivitiesByCategoryId(category_id){
-    return db.query("SELECT * FROM categories WHERE category_id = ?", [category_id])
-    .then((res)=>{
-      console.log("res de la requête sql getActivitiesByCategoryId -->", res)
-      return res
-    })
-    .catch((err)=>{
-      console.log("err de la requête sql getActivitiesByCategoryId -->", err)
-      return err
-    })
-  }
+  // // récupération des activités par leur catégorie de rattachement
+  // static async getAllActivitiesByCategoryId(category_id){
+  //   return db.query("SELECT * FROM categories WHERE category_id = ?", [category_id])
+  //   .then((res)=>{
+  //     console.log("res de la requête sql getActivitiesByCategoryId -->", res)
+  //     return res
+  //   })
+  //   .catch((err)=>{
+  //     console.log("err de la requête sql getActivitiesByCategoryId -->", err)
+  //     return err
+  //   })
+  // }
 
   static async updateActivitiesCategory(old_category_id, new_category_id){
     return db.query("UPDATE activities SET category_id = ? WHERE category_id = ?", [new_category_id, old_category_id])
