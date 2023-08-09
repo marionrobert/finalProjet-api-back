@@ -46,9 +46,9 @@ class BookingModel {
     })
   }
 
-  //récupération d'une réservation par son id
+  //récupération d'une réservation par son id (infos de la réservation et de l'activité associée)
   static async getOneBooking(id){
-    return db.query("SELECT * FROM bookings WHERE id=?", [id])
+    return db.query("SELECT b.*, a.* FROM bookings b JOIN activities a ON b.activity_id = a.id WHERE b.id = ?", [id])
     .then((res)=>{
       console.log("res de la requête sql getOneBooking -->", res)
       return res
@@ -61,8 +61,8 @@ class BookingModel {
 
   //création d'une réservation
   static async saveOneBooking(req){
-    let sql = "INSERT INTO bookings (booker_id, activity_id, points, userToCredit) VALUES (?,?,?,?)"
-    return db.query(sql, [req.body.booker_id, req.body.activity_id, req.body.points, req.body.userToCredit])
+    let sql = "INSERT INTO bookings (booker_id, activity_id, points, provider_id, beneficiairy_id) VALUES (?,?,?,?)"
+    return db.query(sql, [req.body.booker_id, req.body.activity_id, req.body.points, req.body.provider_id, req.body.beneficiary_id])
     .then((res)=>{
       console.log("res de la requête sql saveOneBooking -->", res)
       return res
@@ -74,14 +74,14 @@ class BookingModel {
   }
 
   //modification du statut d'une réservation
-  static async updateCategoryStatus(req, id){
+  static async updateStatus(req, id){
     return db.query("UPDATE bookings SET status=? WHERE id=?", [req.body.status, id])
     .then((res)=>{
-      console.log("res de la requête sql updateCategoryStatus -->", res)
+      console.log("res de la requête sql updateStatus -->", res)
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql updateCategoryStatus -->", err)
+      console.log("err de la requête sql updateStatus -->", err)
       return err
     })
   }

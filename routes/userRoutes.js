@@ -155,7 +155,7 @@ module.exports = (app, db) => {
       res.json({status: 500, msg: "Les informations de l'utilisateur n'ont pas pu être mises à jour.", err: user})
     } else {
       //mon profil est modifié je renvoie les infos du profil mises à jour vers le front (pour que redux mette à jour immédiatement les infos d'utilisateur connecté)
-      let newUser = await userModel.getOneUser(req.params.key_id)
+      let newUser = await userModel.getOneUserByKeyId(req.params.key_id)
       if(newUser.code){
           res.json({status: 500, msg: "Un problème est survenu.", err: newUser})
       } else {
@@ -170,7 +170,7 @@ module.exports = (app, db) => {
     if (changeAvatar.code){
       res.json({status: 500, msg: "Erreur de modification de l'image de profil.", err: changeAvatar})
     } else {
-      let user = await userModel.getOneUser(req.params.key_id)
+      let user = await userModel.getOneUserByKeyId(req.params.key_id)
       if (user.code){
         res.json({status: 500, msg: "Erreur de récupération de l'utilisateur", err: user})
       } else {
@@ -189,7 +189,7 @@ module.exports = (app, db) => {
   })
 
   app.get("/api/v1/user/one/:key_id", withAuth, async(req, res, next)=>{
-    let user = await userModel.getOneUser(req.params.key_id)
+    let user = await userModel.getOneUserByKeyId(req.params.key_id)
     if (user.code){
       res.json({status: 500, msg: "Erreur de récupération de l'utilisateur", err: user })
     } else {

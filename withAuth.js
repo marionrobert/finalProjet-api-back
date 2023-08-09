@@ -17,6 +17,7 @@ const withAuth = (req, res, next) => {
             } else {
                 //le token est vérifié et valide
                 //on rajoute une propriété id dans req, qui récupère l'id du token décrypté
+                console.log("decoded.id -->", decoded.id)
                 req.id = decoded.id
                 //on sort de la fonction, on autorise l'accés à la callback de la route back demandée
                 next()

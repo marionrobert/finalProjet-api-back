@@ -112,7 +112,7 @@ class UserModel {
   }
 
   //récupération d'un utilisateur par son key_id
-  static getOneUser(key_id){
+  static getOneUserByKeyId(key_id){
     return db.query("SELECT * FROM users WHERE key_id = ?", [key_id])
     .then((res)=>{
         return res
@@ -146,15 +146,37 @@ class UserModel {
     })
   }
 
-  static async updatePoints(points, id){
-    return db.query("UPDATE users SET points=? WHERE id=?", [points, id])
+  static async increasePoints(points, id){
+    return db.query("UPDATE users SET points= points + ? WHERE id=?", [points, id])
     .then((res)=>{
-      console.log("res de requête sql updatePoints -->", res)
+      console.log("res de requête sql increasePoints -->", res)
       return res
     })
     .catch((err)=>{
-      console.log("err de requête sql updatePoints -->", err)
+      console.log("err de requête sql increasePoints -->", err)
       return err
+    })
+  }
+
+  static async decreasePoints(points, id){
+    return db.query("UPDATE users SET points= points - ? WHERE id=?", [points, id])
+    .then((res)=>{
+      console.log("res de requête sql decreasePoints -->", res)
+      return res
+    })
+    .catch((err)=>{
+      console.log("err de requête sql decreasePoints -->", err)
+      return err
+    })
+  }
+
+  static async getOneUserById(id){
+    return db.query("SELECT * FROM users WHERE id = ?", [id])
+    .then((res)=>{
+        return res
+    })
+    .catch((err)=>{
+        return err
     })
   }
 }
