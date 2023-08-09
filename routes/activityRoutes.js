@@ -67,6 +67,20 @@ module.exports = (app, db) => {
     }
   })
 
+  // route de récupération des activités où l'auteur est fournisseur ou non - route non protégée car besoin pour la page d'accueil
+  app.post("/api/v1/activity/all/author-is-provider", async(req, res, next)=>{
+    let activities = await activityModel.getAllActivitiesByAuthorIsProvider(req)
+    if (activities.code){
+      res.json({status: 500, msg: `Erreur de récupération des activités selon le critère author_is_provider: ${req.body.authorIsProvider}.`, err: activities})
+    } else {
+      if (activities.length === 0){
+        res.json({status: 401, msg: `Il n'y a pas d'activité correspond au critère author_is_provider: ${req.body.authorIsProvider}.`, activities: activities})
+      } else {
+        res.json({status: 200, msg: "Les activités ont bien été récupérées.", activities: activities})
+      }
+    }
+  })
+
   //route de récupération d'une activité - route protégée
   app.get("/api/v1/activity/:id", withAuth, async(req, res, next)=>{
     if (isNaN(req.params.id)){

@@ -32,7 +32,6 @@ class ActivityModel {
     })
   }
 
-
   //récupération de toutes les activités "en attente de validation"
   static async getAllWaitingActivities(){
     return db.query("SELECT * FROM activities WHERE status=?", ["en attente de validation"])
@@ -55,6 +54,19 @@ class ActivityModel {
     })
     .catch((err)=>{
       console.log("err de la requête sql getAllActivitiesByUser -->", err)
+      return err
+    })
+  }
+
+  // récupérattion de toutes les activités selon  le statut de l'auteur de l'activité (author_is_provider: true/false)
+  static async getAllActivitiesByAuthorIsProvider(req){
+    return db.query("SELECT * FROM activities WHERE authorIsProvider=?", [req.body.authorIsProvider])
+    .then((res)=>{
+      console.log("res de la requête sql getAllActivitiesByAuthorIsProvider -->", res)
+      return res
+    })
+    .catch((err)=>{
+      console.log("err de la requête sql getAllActivitiesByAuthorIsProvider -->", err)
       return err
     })
   }
