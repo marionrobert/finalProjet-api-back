@@ -101,7 +101,7 @@ class BookingModel {
   }
 
   //validation de la réalisation de l'activité par le bénéficiaire
-  static async validateAchievementByBeneficiaryProvider(id){
+  static async validateAchievementByBeneficiary(id){
     return db.query("UPDATE bookings SET beneficiaryValidation=? WHERE id=?", [true, id])
     .then((res)=>{
       console.log("res de la requête sql validateAchievementByBeneficiary -->", res)
