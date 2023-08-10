@@ -166,13 +166,13 @@ module.exports = (app, db)=>{
   })
 
   app.delete("/api/v1/booking/delete/:id", withAuth, async(req,res,next)=>{
-    let bookingToDelete = await bookingModel.getOneBooking(req.params.id)
-    if (bookingToDelete.code){
-      res.json({status: 500, msg: "Erreur de récupération de la réservation.", err: bookingToDelete})
+    let booking = await bookingModel.getOneBooking(req.params.id)
+    if (booking.code){
+      res.json({status: 500, msg: "Erreur de récupération de la réservation.", err: booking})
     } else {
-      if (bookingToDelete[0].booking_status === "acceptée"){
-        res.json({status: 401, msg: "Vous ne pouvez pas annuler une réservation qui a déjà été acceptée."})
-      } else {
+      console.log("booking -->", booking[0])
+      console.log("booking_status -->", booking[0].booking_status)
+      if (booking[0].booking_status === "en attente d'acceptation"){
         // si le booker = beneficiaire, on doit rembourser ce qui a été pré-payé
         if (booking[0].booker_id === booking[0].beneficiary_id){
           //on récupère le bénéficiaire
@@ -192,11 +192,11 @@ module.exports = (app, db)=>{
                 // on envoie un mail pour prévenir le bénéficiaire
                 mail(
                   beneficiary[0].email,
-                  `Annulation de la demande de réservation ${booking[0].id}`,
-                  `Annulation de la demande de réservation ${booking[0].id}`,
+                  `Annulation de la demande de réservation ${booking[0].booking_id}`,
+                  `Annulation de la demande de réservation ${booking[0].booking_id}`,
                   `La demande de réservation pour l'activité ${booking[0].activity_title} a été annulée.`
                 )
-                res.json({status: 200, msg: "La réservation a bien été annulée.", err: bookingCancellation})
+                res.json({status: 200, msg: "La réservation a bien été annulée. Les points ont été recrédités.", err: bookingCancellation})
               }
             }
           }
@@ -220,16 +220,16 @@ module.exports = (app, db)=>{
             }
           }
         }
+      } else {
+        res.json({status: 401, msg: "Vous ne pouvez pas annuler une réservation qui a déjà été acceptée."})
       }
     }
   })
 
-
-
   // route de validation de la réalisation de l'activité par le provider
   app.put("/api/v1/bookings/validate-achievement/provider/:id", withAuth, async(req,res,next)=>{
     if (isNaN(req.params.id)){
-      res.json({status: 500, msg: "L'id renseigné n'est pa sun nombre."})
+      res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
     } else {
       let bookingUpdated = await bookingModel.validateAchievementByProvider(req.params.id)
       if (bookingUpdated.code){
