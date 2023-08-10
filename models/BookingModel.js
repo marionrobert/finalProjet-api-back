@@ -48,7 +48,8 @@ class BookingModel {
 
   //récupération d'une réservation par son id (infos de la réservation et de l'activité associée)
   static async getOneBooking(id){
-    return db.query("SELECT b.*, a.* FROM bookings b JOIN activities a ON b.activity_id = a.id WHERE b.id = ?", [id])
+    let sql = "SELECT b.id AS booking_id, b.booker_id, b.activity_id, b.points, b.provider_id, b.beneficiary_id, b.status AS booking_status, b.providerValidation, b.beneficiaryValidation, a.category_id AS activity_category_id, a.author_id  AS activity_author_id, a.authorIsProvider  AS activity_authorIsProvider, a.title AS activity_title, a.description AS activity_description, a.address AS activity_address, a.zip AS activity_zip, a.city AS activity_city, a.lat AS activity_lat, a.lng AS activity_lng, a.duration AS activity_duration, a.urlPicture AS activity_urlPicture FROM bookings AS b JOIN activities AS a ON b.activity_id = a.id WHERE b.id= ?"
+    return db.query(sql, [id])
     .then((res)=>{
       console.log("res de la requête sql getOneBooking -->", res)
       return res
@@ -61,7 +62,7 @@ class BookingModel {
 
   //création d'une réservation
   static async saveOneBooking(req){
-    let sql = "INSERT INTO bookings (booker_id, activity_id, points, provider_id, beneficiairy_id) VALUES (?,?,?,?)"
+    let sql = "INSERT INTO bookings (booker_id, activity_id, points, provider_id, beneficiary_id) VALUES (?,?,?,?,?)"
     return db.query(sql, [req.body.booker_id, req.body.activity_id, req.body.points, req.body.provider_id, req.body.beneficiary_id])
     .then((res)=>{
       console.log("res de la requête sql saveOneBooking -->", res)
@@ -100,7 +101,7 @@ class BookingModel {
   }
 
   //validation de la réalisation de l'activité par le bénéficiaire
-  static async validateAchievementByBeneficiaryProvider(id){
+  static async validateAchievementByBeneficiary(id){
     return db.query("UPDATE bookings SET beneficiaryValidation=? WHERE id=?", [true, id])
     .then((res)=>{
       console.log("res de la requête sql validateAchievementByBeneficiary -->", res)
@@ -108,6 +109,19 @@ class BookingModel {
     })
     .catch((err)=>{
       console.log("err de la requête sql validateAchievementByBeneficiary -->", err)
+      return err
+    })
+  }
+
+  // suppression d'une résa : cas où elle n'est pas acceptée
+  static async deleteOneBooking(id){
+    return db.query("DELETE FROM bookings WHERE id=?", [id])
+    .then((res)=>{
+      console.log("res de la requête sql deleteOneBooking -->", res)
+      return res
+    })
+    .catch((err)=>{
+      console.log("err de la requête sql deleteOneBooking -->", err)
       return err
     })
   }
