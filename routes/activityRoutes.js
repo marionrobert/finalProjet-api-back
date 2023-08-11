@@ -213,4 +213,18 @@ module.exports = (app, db) => {
       }
     }
   })
+
+  // route de modification de la photo de l'activité
+  app.put("/api/v1/activity/update-picture/:id", withAuth, async(req,res,next)=>{
+    if (isNaN(req.params.id)){
+      res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
+    } else {
+      let updatingResult = await activityModel.updatePicture(req.body.urlPicture, req.params.id)
+      if (updatingResult.code){
+        res.json({status: 500, msg: "Erreur de modification de la photo.", err: updatingResult})
+      } else {
+        res.json({status: 200, msg: "La photo a bien été modifié. Votre activité est désormais en attente de validation par l'administration."})
+      }
+    }
+  })
 }

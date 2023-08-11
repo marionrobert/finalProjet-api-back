@@ -223,4 +223,17 @@ class ActivityModel {
       return err
     })
   }
+
+  //mise à jour de la photo
+  static async updatePicture(picture, id){
+    return db.query("UPDATE activities SET urlPicture = ?, status=? WHERE id = ?", [picture, "en attente de validation", id])
+    .then((res)=>{
+      console.log("res de requête sql updatePicture -->", res)
+      return res
+    })
+    .catch((err)=>{
+      console.log("err de requête sql updatePicture -->", err)
+      return err
+    })
+  }
 }
