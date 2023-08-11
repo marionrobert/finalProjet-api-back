@@ -126,14 +126,14 @@ class ActivityModel {
   }
 
   // validation d'une activité par l'administration (rôle modérateur)
-  static async validatePublicationForOneActivity(id){
-    return db.query("UPDATE activities SET status=? WHERE id=?", ["validée", id])
+  static async moderateOneActivity(req, id){
+    return db.query("UPDATE activities SET status=? WHERE id=?", [req.body.status, id])
     .then((res)=>{
-      console.log("res de la requête sql validatePublicationForOneActivity -->", res)
+      console.log("res de la requête sql moderateOneActivity -->", res)
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql validatePublicationForOneActivity -->", err)
+      console.log("err de la requête sql moderateOneActivity -->", err)
       return err
     })
   }
