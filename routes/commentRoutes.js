@@ -1,6 +1,5 @@
 const withAuth = require("../withAuth")
 const adminAuth = require("../adminAuth")
-const { admin } = require("googleapis/build/src/apis/admin")
 const mail = require('../lib/mailing');
 
 module.exports = (app,db) => {

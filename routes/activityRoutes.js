@@ -1,10 +1,10 @@
-const fs = require("fs") // pour supprimer les images en local
 const withAuth = require("../withAuth")
 const adminAuth = require("../adminAuth")
-const { admin } = require("googleapis/build/src/apis/admin")
+const mail = require('../lib/mailing');
 
 module.exports = (app, db) => {
   const activityModel = require("../models/ActivityModel")(db)
+  const userModel = require ("../models/UserModel")(db)
 
   //route de récupération de toutes les activités
   app.get("/api/v1/activity/all", async(req,res,next)=>{
@@ -119,7 +119,7 @@ module.exports = (app, db) => {
       if (activity.code){
         res.json({status: 500, msg: "Erreur de mise à jour de l'activité.", err: activity})
       } else {
-        res.json({status: 200, msg: "L'activité a bien été mise à jour.", activity: activity})
+        res.json({status: 200, msg: "L'activité a bien été mise à jour. Son nouveua format doit être validé par l'administration.", activity: activity})
       }
     }
   })
@@ -139,15 +139,49 @@ module.exports = (app, db) => {
   })
 
   //route de mise à jour du statut de l'activité par l'admin (en attente de validation --> validé/en ligne) - route admin
-  app.put("/api/v1/activity/admin-validation/:id", adminAuth, async(req, res, next)=>{
+  app.put("/api/v1/activity/moderate/:id", adminAuth, async(req, res, next)=>{
     if (isNaN(req.params.id)){
       res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
     } else {
-      let activity = await activityModel.validatePublicationForOneActivity(req.params.id)
+      let activity = await activityModel.getOneActivity(req.params.id)
       if (activity.code){
-        res.json({status: 500, msg: "Erreur de mise à jour du statut de l'activité.", err: activity})
+        res.json({status: 500, msg:"Erreur de récupération de l'activité.", err: activity})
       } else {
-        res.json({status: 200, msg: "Le statut de l'activité a bien été mise à jour.", activity: activity})
+        if (activity.length === 0){
+          res.json({status: 401, msg: "Il n'existe pas d'activité correspond à l'id renseigné. Le processus de modération de l'activité n'a pas pu aboutir."})
+        } else {
+          let user = await userModel.getOneUserById(activity[0].author_id)
+          if (user.code){
+            res.json({status: 500, msg: "Erreur de récupération de l'auteur du commentaire.Le processus de modération de l'activité n'a pas pu aboutir."})
+          } else {
+            if (user.length === 0){
+              res.json({status: 401, msg: "L'utilisateur n'a pas été retrouvé. Le processus de modération de l'activité n'a pas pu aboutir."})
+            } else {
+              let resultModeration = await activityModel.moderateOneActivity(req, req.params.id)
+              if (resultModeration.code){
+                res.json({status: 500, msg: "Erreur de mise à jour du statut de l'activité. Le processus de modération de l'activité n'a pas pu aboutir.", err: resultModeration})
+              } else {
+                if (req.body.status === "invalidé"){
+                  mail(
+                    user[0].email,
+                    `Invalidation de votre activité `,
+                    `Invalidation de votre activité « ${activity[0].title} »`,
+                    `L'activité que vous avez créée n'a pas été validée par l'administration pour le motif suivant: « ${req.body.explanation} ». Vous pouvez modifier votre activité en prenant en compte cette remarque.`
+                  )
+                  res.json({status: 200, msg: "L'activité n'a pas été validée.", result: resultModeration})
+                } else {
+                  mail(
+                    user[0].email,
+                    `Publication de votre activité `,
+                    `Publication de votre activité « ${activity[0].title} »`,
+                    `Bonne nouvelle ! L'activité que vous avez créée a été validée et est désormais en ligne.`
+                  )
+                  res.json({status: 200, msg: "Le statut de l'activité a bien été mise à jour. L'activité est désormais en ligne.", resultModeration: resultModeration})
+                }
+              }
+            }
+          }
+        }
       }
     }
   })
@@ -176,6 +210,20 @@ module.exports = (app, db) => {
         res.json({status: 401, msg: "Aucune activité ne correspond aux critères demandés."})
       } else {
         res.json({status: 200, activities: activities})
+      }
+    }
+  })
+
+  // route de modification de la photo de l'activité
+  app.put("/api/v1/activity/update-picture/:id", withAuth, async(req,res,next)=>{
+    if (isNaN(req.params.id)){
+      res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
+    } else {
+      let updatingResult = await activityModel.updatePicture(req.body.urlPicture, req.params.id)
+      if (updatingResult.code){
+        res.json({status: 500, msg: "Erreur de modification de la photo.", err: updatingResult})
+      } else {
+        res.json({status: 200, msg: "La photo a bien été modifié. Votre activité est désormais en attente de validation par l'administration."})
       }
     }
   })
