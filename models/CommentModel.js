@@ -70,6 +70,19 @@ class CommentModel {
     })
   }
 
+  //récupération des commentaires qui ont une note élevée (page d'accueil)
+  static async getAllHighScoreComments(){
+    return db.query("SELECT * FROM comments WHERE score >= 4")
+    .then((res)=>{
+      console.log("res de la requête sql getAllHighScoreComments -->", res)
+      return res
+    })
+    .catch((err)=>{
+      console.log("err de la requête sql getAllHighScoreComments -->", err)
+      return err
+    })
+  }
+
   // création d'un commentaire
   static async saveOneComment(req){
     let sql = "INSERT INTO comments (title, content, author_id, activity_id, booking_id, creationTimestamp, score) VALUES (?,?,?,?,?,?,?)"
