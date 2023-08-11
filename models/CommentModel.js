@@ -72,7 +72,7 @@ class CommentModel {
 
   //récupération des commentaires qui ont une note élevée (page d'accueil)
   static async getAllHighScoreComments(){
-    return db.query("SELECT * FROM comments WHERE score >= 4")
+    return db.query("SELECT * FROM comments WHERE score >= ? AND status=?", [4, "validé"])
     .then((res)=>{
       console.log("res de la requête sql getAllHighScoreComments -->", res)
       return res
@@ -107,6 +107,19 @@ class CommentModel {
     })
     .catch((err)=>{
       console.log("err de la requête sql updateOneComent -->", err)
+      return err
+    })
+  }
+
+  // validation du commentaire par l'administration
+  static async moderateComment(req, id){
+    return db.query("UPDATE comments SET status=? WHERE id=>?", [req.body.status, id])
+    .then((res)=>{
+      console.log("res de la requête sql validateComment -->", res)
+      return res
+    })
+    .catch((err)=>{
+      console.log("err de la requête sql validateComment -->", err)
       return err
     })
   }
