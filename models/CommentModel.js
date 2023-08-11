@@ -113,7 +113,7 @@ class CommentModel {
 
   // validation du commentaire par l'administration
   static async moderateComment(req, id){
-    return db.query("UPDATE comments SET status=? WHERE id=>?", [req.body.status, id])
+    return db.query("UPDATE comments SET status=? WHERE id=?", [req.body.status, id])
     .then((res)=>{
       console.log("res de la requête sql validateComment -->", res)
       return res
