@@ -21,7 +21,7 @@ module.exports = (app, db)=>{
     }
   })
 
-  // route de récupération de toutes les réservations concernant les annonces d'un utilisateur - route protégée
+  // route de récupération de toutes les réservations effectuées par un utilisateur (booker_id) - route protégée
   app.get("/api/v1/booking/all/:booker_id", withAuth, async(req, res, next)=>{
     let bookings = await bookingModel.getAllBookingsByBookerId(req.params.booker_id)
     if (bookings.code){
@@ -35,7 +35,7 @@ module.exports = (app, db)=>{
     }
   })
 
-  // route de récupération de toutes les réservations effectuées par un utilisateur (booker_id) - route protégée
+  // route de récupération de toutes les réservations concernant les annonces d'un utilisateur - route protégée
   app.get("/api/v1/booking/all/activities/:author_id", withAuth, async(req,res,next)=>{
     let bookings = await bookingModel.getAllBookingsByAuthorId(req.params.author_id)
     if (bookings.code){
