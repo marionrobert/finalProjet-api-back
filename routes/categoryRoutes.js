@@ -6,7 +6,7 @@ module.exports = (app, db) => {
   const activityModel = require("../models/ActivityModel")(db)
 
   //route de récupération de toutes les catégories - route admin
-  app.get("/api/v1/category/all", adminAuth, async(req, res, next)=>{
+  app.get("/api/v1/category/all", async(req, res, next)=>{
     let categories = await categoryModel.getAllCategories()
     if (categories.code){
       res.json({status: 500, msg: "Erreur de récupération de toutes les catégories.", err: categories})

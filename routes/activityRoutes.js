@@ -6,7 +6,7 @@ module.exports = (app, db) => {
   const activityModel = require("../models/ActivityModel")(db)
   const userModel = require ("../models/UserModel")(db)
 
-  //route de récupération de toutes les activités
+  //route de récupération de toutes les activités - route non protégée
   app.get("/api/v1/activity/all", async(req,res,next)=>{
     let activities = await activityModel.getAllActivities()
     if (activities.code){
@@ -201,7 +201,7 @@ module.exports = (app, db) => {
   })
 
   //route de récupération des activités correspond aux filters appliqués par l'utilisateur
-  app.get("/api/v1/activtity/all/filter", withAuth, async(req, res, next)=>{
+  app.post("/api/v1/activtity/all/filter", withAuth, async(req, res, next)=>{
     let activities = await activityModel.getActivitiesByFilter(req)
     if (activities.code){
       res.json({status: 500, msg: "Erreur de récupération des activités selon les filtres renseignés.", err: activities})
