@@ -197,16 +197,42 @@ module.exports = (app, db) => {
     if (user.code){
       res.json({status: 500, msg: "Erreur de récupération de l'utilisateur", err: user })
     } else {
-      let myUser = {
-        id: user[0].id,
-        email: user[0].email,
-        firstName: user[0].firstName,
-        lastName: user[0].lastName,
-        role: user[0].role,
-        avatar: user[0].avatar,
-        key_id: user[0].key_id
+      if (user.length === 0){
+        res.json({status: 404, msg: "Il n'existe pas d'utilisateur correspond au key_id renseigné", user: user })
+      } else {
+        let myUser = {
+          id: user[0].id,
+          email: user[0].email,
+          firstName: user[0].firstName,
+          lastName: user[0].lastName,
+          role: user[0].role,
+          avatar: user[0].avatar,
+          key_id: user[0].key_id
+        }
+        res.json({status: 200, msg: "User récupéré.", user: myUser })
       }
-      res.json({status: 200, msg: "User récupéré.", user: myUser })
+    }
+  })
+
+  app.get("/api/v1/user/one/id/:id", async(req, res, next)=>{
+    let user = await userModel.getOneUserById(req.params.id)
+    if (user.code){
+      res.json({status: 500, msg: "Erreur de récupération de l'utilisateur", err: user })
+    } else {
+      if (user.length === 0){
+        res.json({status: 404, msg: "Il n'existe pas d'utilisateur correspond à l'id renseigné", user: user })
+      } else {
+        let myUser = {
+          id: user[0].id,
+          email: user[0].email,
+          firstName: user[0].firstName,
+          lastName: user[0].lastName,
+          role: user[0].role,
+          avatar: user[0].avatar,
+          key_id: user[0].key_id
+        }
+        res.json({status: 200, msg: "User récupéré.", user: myUser })
+      }
     }
   })
 }
