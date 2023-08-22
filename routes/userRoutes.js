@@ -46,39 +46,43 @@ module.exports = (app, db) => {
         //on check si il existe un utilisateur dans la bdd avec un mail correspondant
         let user = await userModel.getUserByEmail(req.body.email)
         if(user.code){
-            res.json({status: 500, msg: "Erreur vérification email.", err: user})
+            res.json({status: 500, msg: "Une erreur est survenue dans la vérification du mail.", err: user})
         }else{
             //si il n'existe pas
             if(user.length === 0){
-                res.json({status:404, msg: "Pas d'utilisateur correspondant à ce mail."})
+                res.json({status:404, msg: "Il n'existe pas d'utilisateur correspondant au mail renseigné."})
             } else {
                 //la bdd a retourné un objet d'utilisateur pour ce mail
-                //on compare les password avec bcrypt
-                let same = await bcrypt.compare(req.body.password, user[0].password)
-                //si c'est true, les mdp sont identiques
-                if(same){
-                    //on va créer le payload du token, dans ce payload on stock les valeurs qu'on va glisser dans le token (attention jamais d'infos craignos)
-                    const payload = {email: req.body.email, id: user[0].id, role: user[0].role}
-                    //on crée notre token avec sa signature (secret)
-                    const token = jwt.sign(payload, secret)
-                    let connect = await userModel.updateConnexion(user[0].id)
-                    if(connect.code){
-                        res.json({status: 500, msg: "Erreur de mise à jour de la connexion", err: connect})
-                    } else {
-                        let myUser = {
-                          id: user[0].id,
-                          email: user[0].email,
-                          firstName: user[0].firstName,
-                          lastName: user[0].lastName,
-                          role: user[0].role,
-                          phone: user[0].phone,
-                          avatar: user[0].avatar,
-                          key_id: user[0].key_id
-                        }
-                        res.json({status: 200, msg: "L'utilisateur est connecté", token: token, user: myUser})
-                    }
-                }else{
-                    res.json({status: 401, error: "Votre mot de passe est incorrect!"})
+                if(user[0].accountIsConfirmed === "no"){
+                  res.json({status: 403, msg: "Vous n'avez pas encore validé votre compte."})
+                } else {
+                  //on compare les password avec bcrypt
+                  let same = await bcrypt.compare(req.body.password, user[0].password)
+                  //si c'est true, les mdp sont identiques
+                  if(same){
+                      //on va créer le payload du token, dans ce payload on stock les valeurs qu'on va glisser dans le token (attention jamais d'infos craignos)
+                      const payload = {email: req.body.email, id: user[0].id, role: user[0].role}
+                      //on crée notre token avec sa signature (secret)
+                      const token = jwt.sign(payload, secret)
+                      let connect = await userModel.updateConnexion(user[0].id)
+                      if(connect.code){
+                          res.json({status: 500, msg: "Erreur de mise à jour de la connexion", err: connect})
+                      } else {
+                          let myUser = {
+                            id: user[0].id,
+                            email: user[0].email,
+                            firstName: user[0].firstName,
+                            lastName: user[0].lastName,
+                            role: user[0].role,
+                            phone: user[0].phone,
+                            avatar: user[0].avatar,
+                            key_id: user[0].key_id
+                          }
+                          res.json({status: 200, msg: "L'utilisateur est connecté", token: token, user: myUser})
+                      }
+                  }else{
+                      res.json({status: 401, msg: "Votre mot de passe est incorrect."})
+                  }
                 }
             }
         }
