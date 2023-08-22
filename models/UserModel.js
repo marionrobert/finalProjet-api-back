@@ -171,6 +171,7 @@ class UserModel {
   }
 
   static async getOneUserById(id){
+    console.log("hello from getOneUserById")
     return db.query("SELECT * FROM users WHERE id = ?", [id])
     .then((res)=>{
         return res
