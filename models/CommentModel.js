@@ -83,6 +83,19 @@ class CommentModel {
     })
   }
 
+  // récupération des commentaires rédigés par un utilisateur
+  static async getAllCommentsByAuthorId(author_id){
+    return db.query("SELECT * FROM comments WHERE author_id=?", [author_id])
+    .then((res)=>{
+      console.log("res de la requête sql getAllCommentsByAuthorId -->", res)
+      return res
+    })
+    .catch((err)=>{
+      console.log("err de la requête sql getAllCommentsByAuthorId -->", err)
+      return err
+    })
+  }
+
   // création d'un commentaire
   static async saveOneComment(req){
     let sql = "INSERT INTO comments (title, content, author_id, activity_id, booking_id, creationTimestamp, score) VALUES (?,?,?,?,?,?,?)"

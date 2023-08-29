@@ -113,17 +113,27 @@ module.exports = (app, db) => {
         res.json({status: 404, msg:"Il n'existe pas d'utilisateur avec cet email."})
       } else {
         //optionnel : on change le key_id (sécurité supplémentaire)
+        console.log("je vais changer le key_id")
         let new_key_id = await userModel.updateKeyId(req.body.email)
+        console.log("resultat de la requête await userModel.updateKeyId(req.body.email) -->", new_key_id)
         if (new_key_id.code){
           res.json({status: 500, msg: "Erreur dans le changement du key_id"})
         } else {
-          let key_id = new_key_id.key_id
-          mail(req.body.email,
-            "Demande de changement de mot de passe",
-            "Oups! Vous avez oublié votre mot de passe ?",
-            `Pour modifier votre mot de passe, cliquez <a href="http://localhost:9000/api/v1/user/changePassword/${key_id}">ici</a>!`
-          )
-          res.json({status: 200, msg: "Email de changement de mot de passe envoyé!"})
+          let userUpdated = await userModel.getUserByEmail(req.body.email)
+          if (userUpdated.code){
+            res.json({status: 500, msg: "Erreur de récupération de l'utilisateur.", err: user_existing })
+          } else {
+            if (userUpdated.length === 0){
+              res.json({status: 404, msg:"Il n'existe pas d'utilisateur avec cet email."})
+            } else {
+            mail(req.body.email,
+              "Demande de changement de mot de passe",
+              "Oups! Vous avez oublié votre mot de passe ?",
+              `Pour modifier votre mot de passe, cliquez <a href="http://localhost:9000/api/v1/user/changePassword/${userUpdated[0].key_id}">ici</a>!`
+            )
+            res.json({status: 200, msg: "Email de changement de mot de passe envoyé!"})
+            }
+          }
         }
       }
     }
@@ -137,12 +147,14 @@ module.exports = (app, db) => {
   //route de modification du mot de passe
   app.post('/api/v1/user/changePassword/:key_id', async (req, res, next) => {
     let info = null
-    // console.log(req.body.password1)
-    // console.log(req.body.password2)
+    console.log("hello from userRoutes in api back")
+    console.log(req.body.password1)
+    console.log(req.body.password2)
     if(req.body.password1 !== req.body.password2){
         info = "Vos deux mots de passe ne sont pas identiques!"
     } else {
         let result = await userModel.updatepassword(req.body.password1, req.params.key_id)
+        console.log("result updatepassword -->", result)
         if(result.code){
             info = "Le mot de passe n'a pas pu être modifié. Veuillez réessayer ou contacter le service client."
         } else {

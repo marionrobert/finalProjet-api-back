@@ -89,6 +89,7 @@ module.exports = (app,db) => {
     }
   })
 
+
   //route de récupération des commentaires qui ont une note élevée (page d'accueil)
   app.get("/api/v1/comment/all/highscore", async(req, res, next)=>{
     let comments = await commentModel.getAllHighScoreComments()
@@ -99,6 +100,24 @@ module.exports = (app,db) => {
         res.json({status: 401, msg:"Il n'y a pas encore de commentaires validés avec un score élevé."})
       } else {
         res.json({status: 200, msg: "Les commentaires validés avec un score élevé ont bien été récupérés.", comments: comments})
+      }
+    }
+  })
+
+  // route de récupération des commentaires rédigés par un même utilisateur - route protégée
+  app.get("/api/v1/comment/all/author/:author_id", withAuth, async(req, res, next)=>{
+    if (isNaN(req.params.author_id)){
+      res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
+    } else {
+      let comments = await commentModel.getAllCommentsByAuthorId(req.params.author_id)
+      if (comments.code){
+        res.json({status: 500, msg: "Erreur de récupération des commentaires liés à l'utilisateur.", err: comments})
+      } else {
+        if (comments.length === 0){
+          res.json({status: 401, msg:"Il n'y a pas encore de commentaires liés à l'utilisateur."})
+        } else {
+          res.json({status: 200, msg: "Les commentaires liés à l'utilisateur ont bien été récupérés.", comments: comments})
+        }
       }
     }
   })

@@ -20,7 +20,7 @@ class BookingModel {
 
   // récupération de toutes les réservations concernant les annonces d'un utilisateur
   static async getAllBookingsByAuthorId(author_id){
-    let sql = "SELECT * FROM bookings JOIN activities ON bookings.activity_id = activities.id WHERE activities.author_id=?"
+    let sql = "SELECT bookings.* FROM bookings JOIN activities ON bookings.activity_id = activities.id WHERE activities.author_id=?"
     return db.query(sql, [author_id])
     .then((res)=>{
       console.log("res de la requête sql getAllBookingsByAuthorId -->", res)
@@ -62,8 +62,8 @@ class BookingModel {
 
   //création d'une réservation
   static async saveOneBooking(req){
-    let sql = "INSERT INTO bookings (booker_id, activity_id, points, provider_id, beneficiary_id) VALUES (?,?,?,?,?)"
-    return db.query(sql, [req.body.booker_id, req.body.activity_id, req.body.points, req.body.provider_id, req.body.beneficiary_id])
+    let sql = "INSERT INTO bookings (booker_id, activity_id, activity_title, points, provider_id, beneficiary_id) VALUES (?,?,?,?,?)"
+    return db.query(sql, [req.body.booker_id, req.body.activity_id, req.body.activity_title, req.body.points, req.body.provider_id, req.body.beneficiary_id])
     .then((res)=>{
       console.log("res de la requête sql saveOneBooking -->", res)
       return res
