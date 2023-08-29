@@ -93,7 +93,7 @@ module.exports = (app, db) => {
         if (activity.length === 0){
           res.json({status: 401, msg: "Aucune activité ne correspond à cet id.", activity: activity})
         } else {
-          res.json({status: 200, msg: "L'activité a bien été trouvée.", activity: activity})
+          res.json({status: 200, msg: "L'activité a bien été trouvée.", activity: activity[0]})
         }
       }
     }
