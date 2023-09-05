@@ -166,7 +166,7 @@ module.exports = (app, db) => {
                     user[0].email,
                     `Invalidation de votre activité `,
                     `Invalidation de votre activité « ${activity[0].title} »`,
-                    `L'activité que vous avez créée n'a pas été validée par l'administration pour le motif suivant: « ${req.body.explanation} ». Vous pouvez modifier votre activité en prenant en compte cette remarque.`
+                    `L'activité que vous avez créée n'a pas été validée par l'administration pour le motif suivant: « ${req.body.explanation} ».\nVous pouvez modifier votre activité en prenant en compte cette remarque.`
                   )
                   res.json({status: 200, msg: "L'activité n'a pas été validée.", result: resultModeration})
                 } else {

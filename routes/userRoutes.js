@@ -182,6 +182,7 @@ module.exports = (app, db) => {
 
   // route de modification de la photo de profil
   app.put("/api/v1/user/update-avatar/:key_id", withAuth, async(req, res, next)=>{
+    console.log("req.body.avatar, req.params.key_id -->", req.body.avatar, req.params.key_id)
     let changeAvatar = await userModel.updateAvatar(req.body.avatar, req.params.key_id)
     if (changeAvatar.code){
       res.json({status: 500, msg: "Erreur de modification de l'image de profil.", err: changeAvatar})

@@ -1,12 +1,13 @@
 const { admin } = require("googleapis/build/src/apis/admin")
 const adminAuth = require("../adminAuth")
+const withAuth = require("../withAuth")
 
 module.exports = (app, db) => {
   const categoryModel = require("../models/CategoryModel")(db)
   const activityModel = require("../models/ActivityModel")(db)
 
   //route de récupération de toutes les catégories - route admin
-  app.get("/api/v1/category/all", adminAuth, async(req, res, next)=>{
+  app.get("/api/v1/category/all", withAuth, async(req, res, next)=>{
     let categories = await categoryModel.getAllCategories()
     if (categories.code){
       res.json({status: 500, msg: "Erreur de récupération de toutes les catégories.", err: categories})
