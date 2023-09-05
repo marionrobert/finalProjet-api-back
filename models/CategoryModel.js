@@ -9,7 +9,7 @@ class CategoryModel {
   static async getAllCategories(){
     return db.query("SELECT * FROM categories")
     .then((res)=>{
-      console.log("res de la requête sql getAllCategories -->", res)
+      // console.log("res de la requête sql getAllCategories -->", res)
       return res
     })
     .catch((err)=>{

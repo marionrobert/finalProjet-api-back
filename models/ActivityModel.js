@@ -49,7 +49,7 @@ class ActivityModel {
   static async getAllActivitiesByAuthor(author_id){
     return db.query("SELECT * FROM activities WHERE author_id=?", [author_id])
     .then((res)=>{
-      console.log("res de la requête sql getAllActivitiesByUser -->", res)
+      // console.log("res de la requête sql getAllActivitiesByUser -->", res)
       return res
     })
     .catch((err)=>{
@@ -100,8 +100,8 @@ class ActivityModel {
 
   //modification d'une activité
   static async updateOneActivity(req, id){
-    let sql = "UPDATE activities SET title=?, description=?, address=?, zip=?, city=?, lat=?, lng=?, status=?, duration=?, points=?, urlPicture=?, updatingTimestamps=? WHERE id=?"
-    return db.query(sql, [ req.body.title, req.body.description, req.body.address, req.body.zip, req.body.city, req.body.lat, req.body.lng, "en attente de validation", req.body.duration, req.body.points, req.body.urlPicture, new Date(), id])
+    let sql = "UPDATE activities SET category_id=?, authorIsProvider=?, title=?, description=?, address=?, zip=?, city=?, lat=?, lng=?, status=?, duration=?, points=?, urlPicture=?, updatingTimestamps=? WHERE id=?"
+    return db.query(sql, [req.body.category_id, req.body.authorIsProvider, req.body.title, req.body.description, req.body.address, req.body.zip, req.body.city, req.body.lat, req.body.lng, "en attente de validation", req.body.duration, req.body.points, req.body.urlPicture, new Date(), id])
     .then((res)=>{
       console.log("res de la requête sql updateOneActivity -->", res)
       return res

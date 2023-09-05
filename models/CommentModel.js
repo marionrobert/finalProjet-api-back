@@ -74,7 +74,7 @@ class CommentModel {
   static async getAllHighScoreComments(){
     return db.query("SELECT * FROM comments WHERE score >= ? AND status=?", [4, "validé"])
     .then((res)=>{
-      console.log("res de la requête sql getAllHighScoreComments -->", res)
+      // console.log("res de la requête sql getAllHighScoreComments -->", res)
       return res
     })
     .catch((err)=>{
@@ -87,7 +87,7 @@ class CommentModel {
   static async getAllCommentsByAuthorId(author_id){
     return db.query("SELECT * FROM comments WHERE author_id=?", [author_id])
     .then((res)=>{
-      console.log("res de la requête sql getAllCommentsByAuthorId -->", res)
+      // console.log("res de la requête sql getAllCommentsByAuthorId -->", res)
       return res
     })
     .catch((err)=>{

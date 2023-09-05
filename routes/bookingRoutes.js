@@ -69,6 +69,7 @@ module.exports = (app, db)=>{
 
   // route de création d'une réservation - route protégée
   app.post("/api/v1/booking/save", withAuth, async(req,res,next)=>{
+    console.log("req.body -->", req.body)
     // l'utilisateur ne peut pas réserver sa propre activité
     if (req.body.provider_id === req.body.beneficiary_id){
       res.json({status: 401, msg:"Vous ne pouvez pas réserver votre propre activité."})
@@ -80,12 +81,12 @@ module.exports = (app, db)=>{
           res.json({status: 500, msg: "Erreur de récupération de l'utilisateur bénéficiaire", err: user})
         } else {
           // le booker doit avoir assez de points pour réserver
-          if (user[0].points >= req.body.points){
-            res.json({status: 401, msg:"Vous n'avez pas assez de points pour procéder à la réservation."})
+          if (user[0].points <= req.body.points){
+            res.json({status: 401, msg:"Vous n'avez pas assez de points pour réserver."})
           } else {
             let changePoints = await userModel.decreasePoints(req.body.points, req.body.beneficiary_id)
               if (changePoints.code){
-                res.json({status: 500, msg: "Erreur dans le trasnfert de points."})
+                res.json({status: 500, msg: "Erreur dans le transfert de points."})
               } else {
                 // le transfert de points s'est bien déroulé, on peut faire la réservation
                 let booking = await bookingModel.saveOneBooking(req)
@@ -146,7 +147,7 @@ module.exports = (app, db)=>{
                       }
                     }
                 } else {
-                  res.json({status: 401, msg:"Vous n'avez pas suffisamment de points pour accepter la réservation. Le processus d'acceptation de la réservation n'a pas pu aboutir."})
+                  res.json({status: 401, msg:"Vous n'avez pas assez de points pour accepter la réservation."})
                 }
               }
             }
@@ -170,58 +171,59 @@ module.exports = (app, db)=>{
     if (booking.code){
       res.json({status: 500, msg: "Erreur de récupération de la réservation.", err: booking})
     } else {
-      console.log("booking -->", booking[0])
-      console.log("booking_status -->", booking[0].booking_status)
+      // console.log("booking -->", booking[0])
       if (booking[0].booking_status === "en attente d'acceptation"){
-        // si le booker = beneficiaire, on doit rembourser ce qui a été pré-payé
-        if (booking[0].booker_id === booking[0].beneficiary_id){
-          //on récupère le bénéficiaire
-          let beneficiary = await userModel.getOneUserById(booking[0].beneficiary_id)
-          if (beneficiary.code){
-            res.json({status: 500, msg: "Erreur de récupération du bénéficiaire. Le processus d'annulation de la réservation n'a pas pu aboutir.", err: beneficiary})
-          } else {
-            //on recrédite son compte des points prépayés
-            let changePoints = await userModel.increasePoints(booking[0].points, beneficiary[0].id)
-            if (changePoints.code){  // si échec --> res code erreur 500
-              res.json({status: 500, msg:"Erreur dans la recréditation des points. Le processus d'annulation de la réservation n'a pas pu aboutir.", err: changePoints })
-            } else { //les points ont été recrédités, on peut supprimer la résa
+        // console.log("on peut commencer le processus,je récupère le booker")
+        let booker = await userModel.getOneUserById(booking[0].booker_id)
+        if (booker.code){
+          res.json({status: 500, msg: "Erreur de récupération des données du réservant. Le processus d'annulation n'a pas abouti.", err: booker})
+        } else {
+          // console.log("check si le booker est bénéficiaire")
+          if (booking[0].booker_id === booking[0].beneficiary_id){
+            // console.log("il est bénéficiaire --> on recrédite son compte des points prépayés")
+            let changePoints = await userModel.increasePoints(booking[0].points, booker[0].id)
+            if (changePoints.code){
+              res.json({status: 500, msg:"Erreur dans la recréditation des points. Le processus d'annulation n'a pas abouti.", err: changePoints })
+            } else {
+              // console.log("//les points ont été recrédités, on peut supprimer la résa")
               let bookingCancellation = await bookingModel.deleteOneBooking(req.params.id)
               if (bookingCancellation.code){
                 res.json({status: 500, msg: "Une erreur est survenue lors de l'annulation de la réservation.", err: bookingCancellation})
               } else {
-                // on envoie un mail pour prévenir le bénéficiaire
+                // console.log("la résa est supprimée --> on envoie un mail pour prévenir le bénéficiaire")
                 mail(
-                  beneficiary[0].email,
-                  `Annulation de la demande de réservation ${booking[0].booking_id}`,
-                  `Annulation de la demande de réservation ${booking[0].booking_id}`,
-                  `La demande de réservation pour l'activité ${booking[0].activity_title} a été annulée.`
+                  booker[0].email,
+                  `Annulation d'une demande de réservation`,
+                  `Annulation d'une demande de réservation`,
+                  `La demande de réservation pour l'activité « ${booking[0].activity_title} » a été annulée. Vous avez été recrédité de ${booking[0].points} points.`
                 )
                 res.json({status: 200, msg: "La réservation a bien été annulée. Les points ont été recrédités.", err: bookingCancellation})
               }
             }
-          }
-        } else { // on peut supprimer la résa et envoyer le mail pour prévenir le provider
-          let provider = await userModel.getOneUserById(booking[0].provider_id)
-          if (provider.code){
-            res.json({status: 500, msg: "Erreur de récupération du fournisseur de l'activité. Le processus d'annulation de la réservation n'a pas pu aboutir."})
           } else {
-            let bookingCancellation = await bookingModel.deleteOneBooking(req.params.id)
-            if (bookingCancellation.code){
-              res.json({status: 500, msg: "Erreur de suppresion de la réservation.", err: bookingCancellation})
+            // console.log("// on peut supprimer la résa et envoyer le mail pour prévenir le booker que la résa a été refusée.")
+            let provider = await userModel.getOneUserById(booking[0].provider_id)
+            if (provider.code){
+              res.json({status: 500, msg: "Erreur de récupération du fournisseur de l'activité. Le processus d'annulation de la réservation n'a pas pu aboutir."})
             } else {
-              // on envoie un mail pour prévenir le fournisseur
-              mail(
-                beneficiary[0].email,
-                `Annulation de la demande de réservation ${booking[0].id}`,
-                `Annulation de la demande de réservation ${booking[0].id}`,
-                `La demande de réservation pour l'activité ${booking[0].activity_title} a été annulée.`
-              )
-              res.json({status: 200, msg: "La réservation a bien été annulée.", err: bookingCancellation})
+              let bookingCancellation = await bookingModel.deleteOneBooking(req.params.id)
+              if (bookingCancellation.code){
+                res.json({status: 500, msg: "Erreur de suppresion de la réservation.", err: bookingCancellation})
+              } else {
+                // on envoie un mail pour prévenir le fournisseur
+                mail(
+                  provider[0].email,
+                  `Annulation d'une demande de réservation`,
+                  `Annulation d'une demande de réservation`,
+                  `La demande de réservation pour l'activité « ${booking[0].activity_title} » a été annulée.`
+                )
+                res.json({status: 200, msg: "La réservation a bien été annulée.", err: bookingCancellation})
+              }
             }
           }
         }
       } else {
-        res.json({status: 401, msg: "Vous ne pouvez pas annuler une réservation qui a déjà été acceptée."})
+      res.json({status: 401, msg: "Vous ne pouvez pas annuler une réservation qui a déjà été acceptée."})
       }
     }
   })
