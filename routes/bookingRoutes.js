@@ -167,6 +167,7 @@ module.exports = (app, db)=>{
   })
 
   app.delete("/api/v1/booking/delete/:id", withAuth, async(req,res,next)=>{
+    console.log(req.headers)
     let booking = await bookingModel.getOneBooking(req.params.id)
     if (booking.code){
       res.json({status: 500, msg: "Erreur de récupération de la réservation.", err: booking})
@@ -229,7 +230,8 @@ module.exports = (app, db)=>{
   })
 
   // route de validation de la réalisation de l'activité par le provider
-  app.put("/api/v1/bookings/validate-achievement/provider/:id", withAuth, async(req,res,next)=>{
+  app.put("/api/v1/booking/validate-achievement/provider/:id", withAuth, async(req,res,next)=>{
+    console.log(req.headers)
     if (isNaN(req.params.id)){
       res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
     } else {
@@ -268,21 +270,27 @@ module.exports = (app, db)=>{
                         if (changePoints.code){
                           mail(
                             provider[0].email,
-                            `Erreur : votre compte n'a pas pu être crédit.`,
-                            `Erreur : votre compte n'a pas pu être crédit.`,
-                            `La réservation n°${bookingAfterValidation[0].booker_id} a bien été réalisée mais votre compte n'a pas pu être crédité de ${bookingAfterValidation[0].points} points. Veuillez contacter l'administration.`
+                            `Erreur : votre compte n'a pas pu être crédité.`,
+                            `Erreur : votre compte n'a pas pu être crédité.`,
+                            `L'activité « ${bookingAfterValidation[0].activity_title} » a bien été réalisée (réservation n°${bookingAfterValidation[0].booking_id}) mais votre compte n'a pas pu être crédité de ${bookingAfterValidation[0].points} points. Veuillez contacter l'administration.`
                           )
                           res.json({status:500, msg:"Une erreur est survenue dans le versement des points mais la validation de la réalisation de la réservation a bien eu lieu.", err:changePoints})
                         } else {
-                          let resultUpdating = await bookingModel.updateStatus(req, req.params.id)
-                          if (resultUpdating.code){
-                            res.json({status: 500, msg: "Erreur de changement du statut de la réservation.", err: resultUpdating})
+                          mail(
+                            provider[0].email,
+                            `Activité réalisée : réception des points.`,
+                            `Activité réalisée : réception des points.`,
+                            `L'activité « ${bookingAfterValidation[0].activity_title} » a bien été réalisée (réservation n°${bookingAfterValidation[0].booking_id}) : votre compte a été crédité de ${bookingAfterValidation[0].points} points.`
+                          )
+                          let updatedStatus = await bookingModel.updateStatus(req, req.params.id)
+                          if (updatedStatus.code){
+                            res.json({status: 500, msg: "Erreur de changement du statut de la réservation.", err: updatedStatus, booking: bookingAfterValidation[0]})
                           } else {
-                            res.json({status: 200, msg: "Les points ont bien été crédités au fournisseur. Le statut de la réservation a bien été mis à jour.", result: resultUpdating})
+                            res.json({status: 200, msg: "Les points ont bien été crédités au fournisseur. Le statut de la réservation est 'terminée'.", result: updatedStatus, bookingStatus: req.body.status})
                           }
                         }
                       } else {
-                        res.json({status: 200, msg:"La réalisation de la réservation par le bénéficiaire a bien été enregistrée.", result: resultUpdating})
+                        res.json({status: 200, msg:"La réalisation de la réservation par le bénéficiaire a bien été enregistrée.", result: resultUpdating, booking: bookingAfterValidation[0]})
                       }
                     }
                   }
@@ -296,7 +304,7 @@ module.exports = (app, db)=>{
   })
 
   // route de validation de la réalisation de l'activité par le bénéficiaire
-  app.put("/api/v1/bookings/validate-achievement/beneficiary/:id", withAuth, async(req,res,next)=>{
+  app.put("/api/v1/booking/validate-achievement/beneficiary/:id", withAuth, async(req,res,next)=>{
     if (isNaN(req.params.id)){
       res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
     } else {
@@ -326,7 +334,7 @@ module.exports = (app, db)=>{
                     res.json({status: 500, msg: "Erreur de récupération de la réservation après la validation.", err: bookingAfterValidation})
                   } else {
                     if (bookingAfterValidation.length === 0) {
-                      res.json({status: 401, msg: "Aucune réservation ne correspond à cet id.", booking: bookingAfterValidation})
+                      res.json({status: 401, msg: "Aucune réservation ne correspond à cet id.", booking: bookingAfterValidation[0]})
                     } else {
                       // si les deux utilisateurs ont validé la réalisation, alors on peut créditer les points au fournisseur de l'activité
                       if (bookingAfterValidation[0].providerValidation && bookingAfterValidation[0].beneficiaryValidation){
@@ -336,19 +344,25 @@ module.exports = (app, db)=>{
                             provider[0].email,
                             `Erreur : votre compte n'a pas pu être crédit.`,
                             `Erreur : votre compte n'a pas pu être crédit.`,
-                            `La réservation n°${bookingAfterValidation[0].booker_id} a bien été réalisée mais votre compte n'a pas pu être crédité de ${bookingAfterValidation[0].points} points. Veuillez contacter l'administration.`
+                            `L'activité ${bookingAfterValidation[0].activity_title} a bien été réalisée (réservation n°${bookingAfterValidation[0].booking_id}) mais votre compte n'a pas pu être crédité de ${bookingAfterValidation[0].points} points. Veuillez contacter l'administration.`
                           )
                           res.json({status:500, msg:"Une erreur est survenue dans le versement des points mais la validation de la réalisation de la réservation a bien eu lieu.", err:changePoints})
                         } else {
-                          let resultUpdating = await bookingModel.updateStatus(req, req.params.id)
-                          if (resultUpdating.code){
-                            res.json({status: 500, msg: "Erreur de changement du statut de la réservation.", err: resultUpdating})
+                          mail(
+                            provider[0].email,
+                            `Activité réalisée : réception des points.`,
+                            `Activité réalisée : réception des points.`,
+                            `L'activité ${bookingAfterValidation[0].activity_title} a bien été réalisée (réservation n°${bookingAfterValidation[0].booking_id}) : votre compte a été crédité de ${bookingAfterValidation[0].points} points.`
+                          )
+                          let updatedStatus = await bookingModel.updateStatus(req, req.params.id)
+                          if (updatedStatus.code){
+                            res.json({status: 500, msg: "Erreur de changement du statut de la réservation.", err: updatedStatus, booking: bookingAfterValidation[0]})
                           } else {
-                            res.json({status: 200, msg: "Les points ont bien été crédités au fournisseur. Le statut de la réservation a bien été mis à jour.", result: resultUpdating})
+                            res.json({status: 200, msg: "Les points ont bien été crédités au fournisseur. Le statut de la réservation est 'terminée'.", result: updatedStatus, bookingStatus: req.body.status})
                           }
                         }
                       } else {
-                        res.json({status: 200, msg:"La réalisation de la réservation par le bénéficiaire a bien été enregistrée.", result: resultUpdating})
+                        res.json({status: 200, msg:"La réalisation de la réservation par le bénéficiaire a bien été enregistrée.", result: updatedStatus, booking: bookingAfterValidation[0]})
                       }
                     }
                   }
