@@ -166,16 +166,20 @@ module.exports = (app, db) => {
 
   //route de modification des utilisateurs
   app.put("/api/v1/user/update/:key_id", withAuth, async(req, res, next)=>{
-    let user = await userModel.updateUser(req, req.params.key_id)
+    let user = await userModel.getOneUserByKeyId(req.params.key_id)
     if (user.code){
-      res.json({status: 500, msg: "Les informations de l'utilisateur n'ont pas pu être mises à jour.", err: user})
+      res.json({status: 500, msg: "L'utilisateur n'a pas été retrouvé."})
     } else {
-      //mon profil est modifié je renvoie les infos du profil mises à jour vers le front (pour que redux mette à jour immédiatement les infos d'utilisateur connecté)
-      let newUser = await userModel.getOneUserByKeyId(req.params.key_id)
-      if(newUser.code){
-          res.json({status: 500, msg: "Un problème est survenu.", err: newUser})
+      let result = await userModel.updateUser(req, req.params.key_id)
+      if (result.code){
+        res.json({status: 500, msg: "Les informations de l'utilisateur n'ont pas pu être mises à jour.", err: result})
       } else {
-          res.json({status: 200, msg: "Les informations de l'utilisateur ont bien été mises à jour.", user:newUser[0]})
+        let newUser = await userModel.getOneUserByKeyId(req.params.key_id)
+        if(newUser.code){
+            res.json({status: 500, msg: "Un problème est survenu.", err: newUser})
+        } else {
+            res.json({status: 200, msg: "Les informations de l'utilisateur ont bien été mises à jour.", user:newUser[0]})
+        }
       }
     }
   })
