@@ -9,7 +9,7 @@ class CommentModel {
   static async getAllComments(){
     return db.query("SELECT * FROM comments")
     .then((res)=>{
-      console.log("res de la requête sql getAllComments -->", res)
+      // console.log("res de la requête sql getAllComments -->", res)
       return res
     })
     .catch((err)=>{
@@ -22,7 +22,7 @@ class CommentModel {
   static async getAllWaitingComments(){
     return db.query("SELECT * FROM comments WHERE status=?", ["en attente de validation"])
     .then((res)=>{
-      console.log("res de la requête sql getAllWaitingComments -->", res)
+      // console.log("res de la requête sql getAllWaitingComments -->", res)
       return res
     })
     .catch((err)=>{
@@ -35,7 +35,7 @@ class CommentModel {
   static async getOneCommentById(id){
     return db.query("SELECT * FROM comments WHERE id=?", [id])
     .then((res)=>{
-      console.log("res de la requête sql getOneCommentById -->", res)
+      // console.log("res de la requête sql getOneCommentById -->", res)
       return res
     })
     .catch((err)=>{
@@ -48,7 +48,7 @@ class CommentModel {
   static async getOneCommentByBookingId(booking_id){
     return db.query("SELECT * FROM comments WHERE booking_id=?", [booking_id])
     .then((res)=>{
-      console.log("res de la requête sql getOneCommentByBookingId -->", res)
+      // console.log("res de la requête sql getOneCommentByBookingId -->", res)
       return res
     })
     .catch((err)=>{
@@ -61,7 +61,7 @@ class CommentModel {
   static async getAllCommentsByActivityId(activity_id){
     return db.query("SELECT * FROM comments WHERE activity_id=? AND status=?", [activity_id, "validé"])
     .then((res)=>{
-      console.log("res de la requête sql getAllCommentsByActivityId -->", res)
+      // console.log("res de la requête sql getAllCommentsByActivityId -->", res)
       return res
     })
     .catch((err)=>{

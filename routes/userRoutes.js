@@ -246,6 +246,7 @@ module.exports = (app, db) => {
           lastName: user[0].lastName,
           role: user[0].role,
           avatar: user[0].avatar,
+          phone: user[0].phone,
           key_id: user[0].key_id
         }
         res.json({status: 200, msg: "User récupéré.", user: myUser })
