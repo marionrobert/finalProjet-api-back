@@ -24,7 +24,7 @@ class UserModel {
       let sql = "INSERT INTO users (email, password, firstName, lastName, phone, role, points, creationTimestamp, accountIsConfirmed, key_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
       return db.query(sql, [req.body.email, hashPassword, req.body.firstName, req.body.lastName, req.body.phone, "user", 2, new Date(), "no", key_id])
       .then((res)=>{
-        console.log("res requête sql saveOneUser" + res)
+        // console.log("res requête sql saveOneUser" + res)
         res.key_id = key_id
         return res
       })
@@ -43,7 +43,7 @@ class UserModel {
     let sql = "UPDATE users SET accountIsConfirmed = 'yes' WHERE key_id = ?"
     return db.query(sql, [key_id])
       .then((res)=>{
-        console.log("res requête sql validateAccount" + res)
+        // console.log("res requête sql validateAccount" + res)
         return res
       })
       .catch((err)=>{
@@ -58,7 +58,7 @@ class UserModel {
     let new_key_id = randomId(len, pattern)
     return db.query(sql, [new_key_id, email])
       .then((res)=>{
-        console.log("res requête sql updateKeyId" + res)
+        // console.log("res requête sql updateKeyId" + res)
         return res
       })
       .catch((err)=>{
@@ -75,7 +75,7 @@ class UserModel {
       let sql = "UPDATE users SET password = ? WHERE key_id = ?"
       return db.query(sql, [hashPassword, key_id])
       .then((res)=>{
-        console.log("res requête sql updatepassword" + res)
+        // console.log("res requête sql updatepassword" + res)
         return res
       })
       .catch((err)=>{
@@ -137,7 +137,7 @@ class UserModel {
   static async updateAvatar(avatar, key_id){
     return db.query("UPDATE users SET avatar = ? WHERE key_id = ?", [avatar, key_id])
     .then((res)=>{
-      console.log("res de requête sql updateAvatar -->", res)
+      // console.log("res de requête sql updateAvatar -->", res)
       return res
     })
     .catch((err)=>{
@@ -149,7 +149,7 @@ class UserModel {
   static async increasePoints(points, id){
     return db.query("UPDATE users SET points= points + ? WHERE id=?", [points, id])
     .then((res)=>{
-      console.log("res de requête sql increasePoints -->", res)
+      // console.log("res de requête sql increasePoints -->", res)
       return res
     })
     .catch((err)=>{
@@ -161,7 +161,7 @@ class UserModel {
   static async decreasePoints(points, id){
     return db.query("UPDATE users SET points= points - ? WHERE id=?", [points, id])
     .then((res)=>{
-      console.log("res de requête sql decreasePoints -->", res)
+      // console.log("res de requête sql decreasePoints -->", res)
       return res
     })
     .catch((err)=>{

@@ -22,7 +22,7 @@ class CategoryModel {
   static async getOneCategory(id){
     return db.query("SELECT * FROM categories WHERE id=?", [id])
     .then((res)=>{
-      console.log("res de la requête sql getOneCategory -->", res)
+      // console.log("res de la requête sql getOneCategory -->", res)
       return res
     })
     .catch((err)=>{
@@ -35,7 +35,7 @@ class CategoryModel {
   static async getOneCategoryByTitle(title){
     return db.query("SELECT * FROM categories WHERE title=?", [title])
     .then((res)=>{
-      console.log("res de la requête sql getOneCategoryByTitle -->", res)
+      // console.log("res de la requête sql getOneCategoryByTitle -->", res)
       return res
     })
     .catch((err)=>{
@@ -49,7 +49,7 @@ class CategoryModel {
   static async saveOneCategory(req){
     return db.query("INSERT INTO categories (title) VALUES (?)", [req.body.title])
     .then((res)=>{
-      console.log("res de la requête sql saveOneCategory -->", res)
+      // console.log("res de la requête sql saveOneCategory -->", res)
       return res
     })
     .catch((err)=>{
@@ -62,7 +62,7 @@ class CategoryModel {
   static async updateOneCategory(req, id){
     return db.query("UPDATE categories SET title=? WHERE id=?", [req.body.title, id])
     .then((res)=>{
-      console.log("res de la requête sql updateOneCategory -->", res)
+      // console.log("res de la requête sql updateOneCategory -->", res)
       return res
     })
     .catch((err)=>{
@@ -75,7 +75,7 @@ class CategoryModel {
   static async deleteOneCategory(id){
     return db.query("DELETE FROM categories WHERE id=?", [id])
     .then((res)=>{
-      console.log("res de la requête sql deleteOneCategory -->", res)
+      // console.log("res de la requête sql deleteOneCategory -->", res)
       return res
     })
     .catch((err)=>{

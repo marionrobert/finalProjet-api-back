@@ -9,7 +9,7 @@ class ActivityModel {
   static async getAllActivities(){
     return db.query("SELECT * FROM activities")
     .then((res)=>{
-      console.log("res de la requête sql getAllActivities -->", res)
+      // console.log("res de la requête sql getAllActivities -->", res)
       return res
     })
     .catch((err)=>{
@@ -23,7 +23,7 @@ class ActivityModel {
     console.log("hello from getAllOnelineActivities")
     return db.query("SELECT * FROM activities WHERE status=?", ["en ligne"])
     .then((res)=>{
-      console.log("res de la requête sql getAllOnlineActivities -->", res)
+      // console.log("res de la requête sql getAllOnlineActivities -->", res)
       return res
     })
     .catch((err)=>{
@@ -36,7 +36,7 @@ class ActivityModel {
   static async getAllWaitingActivities(){
     return db.query("SELECT * FROM activities WHERE status=?", ["en attente de validation"])
     .then((res)=>{
-      console.log("res de la requête sql getAllWaitingActivities -->", res)
+      // console.log("res de la requête sql getAllWaitingActivities -->", res)
       return res
     })
     .catch((err)=>{
@@ -62,7 +62,7 @@ class ActivityModel {
   static async getAllActivitiesByAuthorIsProvider(req){
     return db.query("SELECT * FROM activities WHERE authorIsProvider=?", [req.body.authorIsProvider])
     .then((res)=>{
-      console.log("res de la requête sql getAllActivitiesByAuthorIsProvider -->", res)
+      // console.log("res de la requête sql getAllActivitiesByAuthorIsProvider -->", res)
       return res
     })
     .catch((err)=>{

@@ -9,7 +9,7 @@ class BookingModel {
   static async getAllBookings(){
     return db.query("SELECT * FROM bookings")
     .then((res)=>{
-      console.log("res de la requête sql getAllBookings -->", res)
+      // console.log("res de la requête sql getAllBookings -->", res)
       return res
     })
     .catch((err)=>{
@@ -51,7 +51,7 @@ class BookingModel {
     let sql = "SELECT b.id AS booking_id, b.booker_id, b.activity_id, b.points, b.provider_id, b.beneficiary_id, b.status AS booking_status, b.providerValidation, b.beneficiaryValidation, a.category_id AS activity_category_id, a.author_id  AS activity_author_id, a.authorIsProvider  AS activity_authorIsProvider, a.title AS activity_title, a.description AS activity_description, a.address AS activity_address, a.zip AS activity_zip, a.city AS activity_city, a.lat AS activity_lat, a.lng AS activity_lng, a.duration AS activity_duration, a.urlPicture AS activity_urlPicture FROM bookings AS b JOIN activities AS a ON b.activity_id = a.id WHERE b.id= ?"
     return db.query(sql, [id])
     .then((res)=>{
-      console.log("res de la requête sql getOneBooking -->", res)
+      // console.log("res de la requête sql getOneBooking -->", res)
       return res
     })
     .catch((err)=>{
@@ -65,7 +65,7 @@ class BookingModel {
     let sql = "INSERT INTO bookings (booker_id, activity_id, activity_title, points, provider_id, beneficiary_id) VALUES (?,?,?,?,?,?)"
     return db.query(sql, [req.body.booker_id, req.body.activity_id, req.body.activity_title, req.body.points, req.body.provider_id, req.body.beneficiary_id])
     .then((res)=>{
-      console.log("res de la requête sql saveOneBooking -->", res)
+      // console.log("res de la requête sql saveOneBooking -->", res)
       return res
     })
     .catch((err)=>{
@@ -78,7 +78,7 @@ class BookingModel {
   static async updateStatus(req, id){
     return db.query("UPDATE bookings SET status=? WHERE id=?", [req.body.status, id])
     .then((res)=>{
-      console.log("res de la requête sql updateStatus -->", res)
+      // console.log("res de la requête sql updateStatus -->", res)
       return res
     })
     .catch((err)=>{
@@ -91,7 +91,7 @@ class BookingModel {
   static async validateAchievementByProvider(id){
     return db.query("UPDATE bookings SET providerValidation=? WHERE id=?", [true, id])
     .then((res)=>{
-      console.log("res de la requête sql validateAchievementByProvider -->", res)
+      // console.log("res de la requête sql validateAchievementByProvider -->", res)
       return res
     })
     .catch((err)=>{
@@ -104,7 +104,7 @@ class BookingModel {
   static async validateAchievementByBeneficiary(id){
     return db.query("UPDATE bookings SET beneficiaryValidation=? WHERE id=?", [true, id])
     .then((res)=>{
-      console.log("res de la requête sql validateAchievementByBeneficiary -->", res)
+      // console.log("res de la requête sql validateAchievementByBeneficiary -->", res)
       return res
     })
     .catch((err)=>{
@@ -117,7 +117,7 @@ class BookingModel {
   static async deleteOneBooking(id){
     return db.query("DELETE FROM bookings WHERE id=?", [id])
     .then((res)=>{
-      console.log("res de la requête sql deleteOneBooking -->", res)
+      // console.log("res de la requête sql deleteOneBooking -->", res)
       return res
     })
     .catch((err)=>{
