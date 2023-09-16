@@ -21,7 +21,7 @@ class ActivityModel {
   //récupération de toutes les activités "en ligne"
   static async getAllOnlineActivities(){
     console.log("hello from getAllOnelineActivities")
-    return db.query("SELECT * FROM activities WHERE status=?", ["en ligne"])
+    return db.query("SELECT * FROM activities WHERE status=? ORDER BY updatingTimestamps DESC", ["en ligne"])
     .then((res)=>{
       // console.log("res de la requête sql getAllOnlineActivities -->", res)
       return res

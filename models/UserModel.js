@@ -22,7 +22,7 @@ class UserModel {
 
       //requète sql
       let sql = "INSERT INTO users (email, password, firstName, lastName, phone, role, points, creationTimestamp, accountIsConfirmed, key_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-      return db.query(sql, [req.body.email, hashPassword, req.body.firstName, req.body.lastName, req.body.phone, "user", 2, new Date(), "no", key_id])
+      return db.query(sql, [req.body.email, hashPassword, req.body.firstName, req.body.lastName, req.body.phone, "user", 5, new Date(), "no", key_id])
       .then((res)=>{
         // console.log("res requête sql saveOneUser" + res)
         res.key_id = key_id

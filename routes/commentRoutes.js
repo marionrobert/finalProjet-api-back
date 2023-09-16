@@ -47,7 +47,7 @@ module.exports = (app,db) => {
         if (comment.length === 0){
           res.json({status: 401, msg:"Il n'existe pas de commentaire répondant à l'id renseigné."})
         } else {
-          res.json({status: 200, msg: "Le commentaire a bien été récupéré.", comment: comment})
+          res.json({status: 200, msg: "Le commentaire a bien été récupéré.", comment: comment[0]})
         }
       }
     }
@@ -65,7 +65,7 @@ module.exports = (app,db) => {
         if (comment.length === 0){
           res.json({status: 401, msg:"Il n'existe pas encore de commentaire lié à cette réservation."})
         } else {
-          res.json({status: 200, msg: "Le commentaire a bien été récupéré.", comment: comment})
+          res.json({status: 200, msg: "Le commentaire a bien été récupéré.", comment: comment[0]})
         }
       }
     }
