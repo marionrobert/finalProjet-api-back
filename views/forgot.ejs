@@ -37,16 +37,6 @@
           z-index: 3;
         }
 
-        nav#navbar-menu {
-          display:flex;
-          justify-content: space-between;
-          align-items: center;
-          position: relative;
-          height: 100%;
-          background-color: rgb(246, 237, 222);
-          padding-right: 1rem;
-        }
-
         div#brand {
           display: flex;
           align-items: center;
@@ -57,6 +47,7 @@
           font-size: 1.3rem;
           color: rgb(94, 82, 56);
         };
+
         img.brand-icon {
           width: 46px;
           height: auto;
@@ -67,7 +58,7 @@
         h1 {
           font-family: 'Pacifico', cursive;
           font-weight: lighter;
-          font-size: 1.3rem;
+          font-size: 1.2rem;
           color: rgb(194, 169, 109);
           width: 100%;
           margin: 3% 5%;
@@ -92,7 +83,7 @@
         }
 
         form > * {
-        width: 80%;
+          width: 80%;
         }
 
         label {
@@ -116,6 +107,24 @@
           width: 65%;
           cursor: pointer;
         }
+
+        button a {
+          text-decoration: none;
+          color: white;
+        }
+
+        div.result {
+          width: 80%;
+        }
+
+        div.result p {
+          font-size: 0.9rem;
+          margin-bottom: 0;
+        }
+
+        div.result button {
+          width: 50%;
+        }
     </style>
   </head>
   <body>
@@ -131,15 +140,23 @@
     </header>
     <main>
       <h1>Réinitialisation du mot de passe de votre compte Harmony</h1>
-      <% if(info !== null) { %>
-          <p><%= info %></p>
-      <% } %>
       <form action="/api/v1/user/changePassword/<%=key_id%>" method="POST">
-          <label>Entrez votre mot de passe deux fois.</label>
-          <input type="password" name="password1" placeholder="Entrez votre nouveau mot de passe" />
-          <input type="password" name="password2" placeholder="Retapez-le à l'identique"/>
-          <button>Envoyer</button>
+        <label>Entrez votre mot de passe deux fois.</label>
+        <input type="password" name="password1" placeholder="Entrez votre nouveau mot de passe" required />
+        <input type="password" name="password2" placeholder="Retapez-le à l'identique" required/>
+        <button>Envoyer</button>
       </form>
+      <% if(info !== null) { %>
+        <div class="result">
+          <p style="color:seagreen"><%= info %></p>
+          <button><a href="http://127.0.0.1:5173/login">Me connecter</a></button>
+        </div>
+      <% } %>
+      <% if(error !== null) { %>
+        <div class="result">
+          <p style="color:indianred"><%= error %></p>
+        </div>
+      <% } %>
     </main>
 
   </body>

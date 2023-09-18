@@ -141,27 +141,28 @@ module.exports = (app, db) => {
 
   //route d'affichage du template de modification de password (ejs)
   app.get('/api/v1/user/changePassword/:key_id', async (req, res, next) => {
-    res.render('forgot', {key_id: req.params.key_id, info: null})
+    res.render('forgot', {key_id: req.params.key_id, info: null, error: null})
   })
 
   //route de modification du mot de passe
   app.post('/api/v1/user/changePassword/:key_id', async (req, res, next) => {
     let info = null
+    let error = null
     console.log("hello from userRoutes in api back")
-    console.log(req.body.password1)
-    console.log(req.body.password2)
+    console.log("req.body.password1", req.body.password1)
+    console.log("req.body.password1", req.body.password2)
     if(req.body.password1 !== req.body.password2){
-        info = "Vos deux mots de passe ne sont pas identiques!"
+        error = "Vos deux mots de passe ne sont pas identiques!"
     } else {
         let result = await userModel.updatepassword(req.body.password1, req.params.key_id)
         console.log("result updatepassword -->", result)
         if(result.code){
-            info = "Le mot de passe n'a pas pu être modifié. Veuillez réessayer ou contacter le service client."
+            error = "Le mot de passe n'a pas pu être modifié. Veuillez réessayer ou contacter le service client."
         } else {
             info = "Le mot de passe a bien été modifié! Vous pouvez désormais vous connecter."
         }
     }
-    res.render('forgot', {key_id: req.params.key_id, info})
+    res.render('forgot', {key_id: req.params.key_id, info: info, error: error})
   })
 
   //route de modification des utilisateurs
