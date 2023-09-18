@@ -78,7 +78,7 @@ module.exports = (app, db)=>{
       if (req.body.beneficiary_id === req.body.booker_id){
         let user = await userModel.getOneUserById(req.body.beneficiary_id)
         if (user.code){
-          res.json({status: 500, msg: "Erreur de récupération de l'utilisateur bénéficiaire", err: user})
+          res.json({status: 500, msg: "Erreur de récupération de l'utilisateur.", err: user})
         } else {
           // le booker doit avoir assez de points pour réserver
           if (user[0].points <= req.body.points){
@@ -362,7 +362,7 @@ module.exports = (app, db)=>{
                           }
                         }
                       } else {
-                        res.json({status: 200, msg:"La réalisation de la réservation par le bénéficiaire a bien été enregistrée.", result: updatedStatus, booking: bookingAfterValidation[0]})
+                        res.json({status: 200, msg:"La réalisation de la réservation par le bénéficiaire a bien été enregistrée.", result: resultUpdating, booking: bookingAfterValidation[0]})
                       }
                     }
                   }
