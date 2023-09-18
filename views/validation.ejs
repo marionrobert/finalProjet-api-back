@@ -1,9 +1,187 @@
-<header>
-  <h1>Validation de votre compte Harmony</h1>
-</header>
-<main>
-  <% if(info !== null) { %>
-      <p><%= info %></p>
-  <% } %>
-  
-</main>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Harmony</title>
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" >
+      <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+      <style>
+        /* Ajoutez ici vos styles CSS pour le fichier EJS */
+        html {
+          margin: 0;
+          padding: 0;
+          border: 0;
+          font: inherit;
+          vertical-align: baseline;
+        }
+
+        body {
+          text-align: center;
+          font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+          background-color: whitesmoke;
+        }
+
+        main {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          margin-top: 60px;
+          text-align: center;
+        }
+
+        a{
+          text-decoration: none;
+          cursor: pointer;
+        }
+
+        header {
+          background-color: rgb(246, 237, 222);
+          width: 100%;
+          position: fixed;
+          top: 0;
+          left: 0;
+          height: 60px;
+          z-index: 3;
+        }
+
+        div#brand {
+          display: flex;
+          align-items: center;
+        }
+
+        div#brand span {
+          font-family: 'Pacifico', cursive;
+          font-size: 1.3rem;
+          color: rgb(94, 82, 56);
+        };
+
+        img.brand-icon {
+          width: 46px;
+          height: auto;
+          background-color: white;
+          border-radius: 50px;
+        }
+
+        h1 {
+          font-family: 'Pacifico', cursive;
+          font-weight: lighter;
+          font-size: 1.3rem;
+          color: rgb(94, 82, 56);
+          width: 100%;
+          margin: 3% 5%;
+          padding: 0;
+        }
+
+        img.brand-icon {
+          width: 46px;
+          height: auto;
+          background-color: white;
+          border-radius: 50px;
+        }
+
+        form {
+          border: 1px solid rgb(194, 169, 109);
+          padding: 1.5rem 0.5rem;
+          width: 450px;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          margin: 0 10%;
+        }
+
+        form > * {
+          width: 80%;
+        }
+
+        label {
+          font-size: 0.9rem;
+          font-weight: bolder;
+        }
+
+        input {
+          border-color: rgb(194, 169, 109);
+          margin: 1rem 0 0;
+          border-radius: 2px;
+        }
+
+        button {
+          background-color: rgb(194, 169, 102);
+          color: white;
+          border: none;
+          border-radius: 2px;
+          padding: 0.5rem;
+          margin: 1rem 0;
+          width: 65%;
+          cursor: pointer;
+        }
+
+        button a {
+          text-decoration: none;
+          color: white;
+        }
+
+        div.result {
+          width: 75%;
+        }
+
+        div.result p {
+          font-size: 0.9rem;
+          margin-bottom: 0;
+        }
+
+        div.result button {
+          width: 200px;
+        }
+
+        footer {
+          background-color: rgb(246, 237, 222);
+          width: 100%;
+          display:flex;
+          z-index: 3;
+          justify-content: center;
+          align-items: center;
+          height: 60px;
+          position: fixed;
+          bottom: 0;
+          left: 0;
+        }
+
+        footer a, footer p, footer .fa-brands {
+          padding: 0 0.5rem;
+          color: rgb(94, 82, 56);
+        }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav id="navbar-menu">
+        <div id="brand">
+          <a href="http://127.0.0.1:5173/">
+            <img src="https://img.freepik.com/vecteurs-libre/arbre-vie-dessine-main-fleurs_23-2148679928.jpg?w=740&t=st=1694890323~exp=1694890923~hmac=552def321cee88e1d103f6b15ecb5535d96819a111c46e23a5e1ee0c0b26acab" class="brand-icon" alt="Logo arbre de vie"/>
+          </a>
+          <a href="http://127.0.0.1:5173/"><span>Harmony</span></a>
+        </div>
+      </nav>
+    </header>
+    <main>
+      <h1>Validation de votre compte Harmony</h1>
+      <% if(info !== null) { %>
+        <div class="result">
+          <p><%= info %></p>
+          <button><a href="http://127.0.0.1:5173/login">Me connecter</a></button>
+        </div>
+      <% } %>
+      <% if(error !== null) { %>
+        <div class="result">
+          <p style="color:indianred"><%= error %></p>
+        </div>
+      <% } %>
+    </main>
+    <footer>
+      <a href="https://www.linkedin.com/in/marion-robert-" target="_blank" rel='noreferrer'><i class="fa-brands fa-linkedin"></i></a>
+      <p>Created by Marion Robert </p>
+      <a href="https://github.com/marionrobert" target="_blank" rel='noreferrer'><i class="fa-brands fa-github"></i></a>
+    </footer>
+  </body>
+</html>
