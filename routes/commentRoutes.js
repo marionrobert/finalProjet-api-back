@@ -11,10 +11,12 @@ module.exports = (app,db) => {
   app.get("/api/v1/comment/all", withAuth, async(req, res, next)=>{
     let comments = await commentModel.getAllComments()
     if (comments.code){
+      // erreur
       res.json({status: 500, msg: "Erreur de récupération des commentaires.", err: comments})
     } else {
+      // aucun résultat trouvé --> code 204
       if (comments.length === 0){
-        res.json({status: 401, msg:"Il n'y a pas encore de commentaires."})
+        res.json({status: 204, msg:"Il n'y a pas encore de commentaires."})
       } else {
         res.json({status: 200, msg: "Les commentaires ont bien été récupérés.", comments: comments})
       }
@@ -25,10 +27,12 @@ module.exports = (app,db) => {
   app.get("/api/v1/comment/all/waiting", adminAuth, async(req, res, next)=>{
     let comments = await commentModel.getAllWaitingComments()
     if (comments.code){
+      // erreur
       res.json({status: 500, msg: "Erreur de récupération des commentaires en attente de validation par l'administration.", err: comments})
     } else {
+      // aucun résultat trouvé --> code 204
       if (comments.length === 0){
-        res.json({status: 401, msg:"Il n'y a pas de commentaires en attente de validation par l'administration."})
+        res.json({status: 204, msg:"Il n'y a pas de commentaires en attente de validation par l'administration."})
       } else {
         res.json({status: 200, msg: "Les commentaires en attente de validation par l'administrationont bien été récupérés.", comments: comments})
       }
@@ -44,8 +48,9 @@ module.exports = (app,db) => {
       if (comment.code){
         res.json({status: 500, msg: "Erreur de récupération du commentaire.", err: comment})
       } else {
+        // aucun résultat trouvé --> code 204
         if (comment.length === 0){
-          res.json({status: 401, msg:"Il n'existe pas de commentaire répondant à l'id renseigné."})
+          res.json({status: 204, msg:"Il n'existe pas de commentaire répondant à l'id renseigné."})
         } else {
           res.json({status: 200, msg: "Le commentaire a bien été récupéré.", comment: comment[0]})
         }
@@ -59,11 +64,13 @@ module.exports = (app,db) => {
       res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
     } else {
       let comment = await commentModel.getOneCommentByBookingId(req.params.booking_id)
+      // erreur
       if (comment.code){
         res.json({status: 500, msg: "Erreur de récupération du commentaire.", err: comment})
       } else {
+        // aucun résultat trouvé --> code 204
         if (comment.length === 0){
-          res.json({status: 401, msg:"Il n'existe pas encore de commentaire lié à cette réservation."})
+          res.json({status: 204, msg:"Il n'existe pas encore de commentaire lié à cette réservation."})
         } else {
           res.json({status: 200, msg: "Le commentaire a bien été récupéré.", comment: comment[0]})
         }
@@ -78,10 +85,12 @@ module.exports = (app,db) => {
     } else {
       let comments = await commentModel.getAllCommentsByActivityId(req.params.activity_id)
       if (comments.code){
+        // erreur
         res.json({status: 500, msg: "Erreur de récupération des commentaires validés liés à cette activité.", err: comments})
       } else {
+        // aucun résultat trouvé --> code 204
         if (comments.length === 0){
-          res.json({status: 401, msg:"Il n'existe pas encore de commentaires validés liés à cette activité."})
+          res.json({status: 204, msg:"Il n'existe pas encore de commentaires validés liés à cette activité."})
         } else {
           res.json({status: 200, msg: "Les commentaires validés liés à l'activité ont bien été récupérés.", comments: comments})
         }
@@ -94,10 +103,12 @@ module.exports = (app,db) => {
   app.get("/api/v1/comment/all/highscore", async(req, res, next)=>{
     let comments = await commentModel.getAllHighScoreComments()
     if (comments.code){
+      // erreur
       res.json({status: 500, msg: "Erreur de récupération des commentaires validés avec un score élevé.", err: comments})
     } else {
+      // aucun résultat trouvé --> code 204
       if (comments.length === 0){
-        res.json({status: 401, msg:"Il n'y a pas encore de commentaires validés avec un score élevé."})
+        res.json({status: 204, msg:"Il n'y a pas encore de commentaires validés avec un score élevé."})
       } else {
         res.json({status: 200, msg: "Les commentaires validés avec un score élevé ont bien été récupérés.", comments: comments})
       }
@@ -111,10 +122,12 @@ module.exports = (app,db) => {
     } else {
       let comments = await commentModel.getAllCommentsByAuthorId(req.params.author_id)
       if (comments.code){
+        // erreur
         res.json({status: 500, msg: "Erreur de récupération des commentaires liés à l'utilisateur.", err: comments})
       } else {
+        // aucun résultat trouvé --> code 204
         if (comments.length === 0){
-          res.json({status: 401, msg:"Il n'y a pas encore de commentaires liés à l'utilisateur."})
+          res.json({status: 204, msg:"Il n'y a pas encore de commentaires liés à l'utilisateur."})
         } else {
           res.json({status: 200, msg: "Les commentaires liés à l'utilisateur ont bien été récupérés.", comments: comments})
         }
@@ -127,10 +140,12 @@ module.exports = (app,db) => {
     // création du commentaire uniquement si la réservation est terminée
     let booking = await bookingModel.getOneBooking(req.body.booking_id)
     if (booking.code){
+      // erreur
       res.json({status: 500, msg:"Erreur de récupération de la réservation.", err: booking})
     } else {
+      // aucun résultat trouvé --> code 204
       if(booking.length === 0){
-        res.json({status: 401, msg:"Il n'existe pas de réservation correspond à l'id renseigné."})
+        res.json({status: 204, msg:"Il n'existe pas de réservation correspond à l'id renseigné."})
       } else {
         if (booking[0].booking_status !== "terminée"){
           res.json({status: 401, msg:"Vous ne pouvez pas laissé un commentaire tant que l'activité n'a pas été réalisée."})
@@ -138,6 +153,7 @@ module.exports = (app,db) => {
           let commentAlreadyExisting = await commentModel.getOneCommentByBookingId(req.body.booking_id)
           // console.log("commentAlreadyExisting -->", commentAlreadyExisting)
           if (commentAlreadyExisting.code){
+            // erreur
             res.json({status: 500, msg:"Erreur de vérification du commentaire déjà existant. Le processus de création du commentaire n'a pas pu aboutir.", err: commentAlreadyExisting})
           } else {
             if (commentAlreadyExisting.length > 0){
@@ -145,6 +161,7 @@ module.exports = (app,db) => {
             } else {
               let comment = await commentModel.saveOneComment(req)
               if (comment.code){
+                // erreur
                 res.json({status: 500, msg: "Erreur dans la création du commentaire: le processus n'a pas pu aboutir.", err: comment})
               } else {
                 res.json({status: 200, msg: "Le commentaire a bien été créé. Il est en attente de validation par l'administration."})
@@ -159,22 +176,29 @@ module.exports = (app,db) => {
   // route de mise à jour d'un commentaire -route protégée
   app.put("/api/v1/comment/update/:id", withAuth, async(req, res, next)=>{
     if (isNaN(req.params.id)){
+      // bad request ?
+      // vérification
       res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
     } else {
       let comment = await commentModel.getOneCommentById(req.params.id)
       if (comment.code){
+        // erreur
         res.json({status: 500, msg: "Erreur de récupération du commentaire. Le processus de modification n'a pas pu aboutir.", err: comment})
       } else {
+        // aucun résultat trouvé --> code 204
         if (comment.length === 0){
-          res.json({status: 401, msg: "Il n'existe pas de commentaire lié à cet id."})
+          res.json({status: 204, msg: "Il n'existe pas de commentaire lié à cet id."})
         } else {
           if (comment[0].status === "validé"){
             res.json({status: 401, msg:"Le commentaire a déjà été validé par l'administration, vous ne pouvez plus le modifier."})
           } else {
+            // si le commentaire n'est as encore validé, possibilité de la modifier
             let resultUpdating = await commentModel.updateOneComent(req, req.params.id)
             if (resultUpdating.code){
-              res.json({status: 500, msg: "Erreur: le processus de modification du commentaire n'a pas pu aboutir.", err: resultUpdating})
+              // erreur
+              res.json({status: 500, msg: "Le processus de modification du commentaire n'a pas pu aboutir.", err: resultUpdating})
             } else {
+              // succès: le commentaire a été mis à jour
               res.json({status: 200, msg: "Le commentaire a bien été mis à jour.", resultUpdating: resultUpdating})
             }
           }
@@ -183,7 +207,7 @@ module.exports = (app,db) => {
     }
   })
 
-  //route de suppression d'un commentaire -route protégée
+  //route de suppression d'un commentaire - route protégée
   app.delete("/api/v1/comment/delete/:id", withAuth, async(req, res, next)=>{
     if (isNaN(req.params.id)){
       res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
@@ -202,23 +226,30 @@ module.exports = (app,db) => {
     if (isNaN(req.params.id)){
       res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
     } else {
+      // récupération d'une commentaire par son id
       let comment = await commentModel.getOneCommentById(req.params.id)
       if (comment.code){
         res.json({status: 500, msg:"Erreur de récupération du commentaire. Le processus de modération n'a pas pu aboutir.", err: comment})
       } else {
+        // aucun résultat trouvé -> code 204
         if (comment.length === 0){
-          res.json({status: 401, msg: "Il n'existe pas de commentaire répondant à cet id. Le processus de modération n'a pas pu aboutir."})
+          res.json({status: 204, msg: "Il n'existe pas de commentaire répondant à cet id. Le processus de modération n'a pas pu aboutir."})
         } else {
+          // modération : changement de statut du commentaire
           let resultModeration = await commentModel.moderateComment(req, req.params.id)
           if (resultModeration.code){
+            // erreur dans l'excution de la requête de modération
             res.json({status: 500, msg: "Erreur: le processus de modération du commentaire n'a pas pu aboutir.", err: resultModeration})
           } else {
+            // récupération de l'auteur du commentaire
             let user = await userModel.getOneUserById(comment[0].author_id)
             if (user.code){
+              // erreur
               res.json({status: 500, msg: "Erreur de récupération de l'auteur du commentaire"})
             } else {
+              // aucun résultat trouvé --> code 204
               if (user.length === 0){
-                res.json({status: 401, msg: "L'utilisateur n'a pas été retrouvé."})
+                res.json({status: 401, msg: "L'utilisateur n'a pas été retrouvé. Aucun email n'a pu lui être envoyé."})
               } else {
                 if (req.body.status === "validé"){
                   // envoi du mail à l'auteur du commmentaire pour le prévenir que le commentaire a été validé
@@ -226,17 +257,19 @@ module.exports = (app,db) => {
                     user[0].email,
                     `Validation de votre commentaire pour la réservation n°${comment[0].booking_id}`,
                     `Validation de votre commentaire pour la réservation n°${comment[0].booking_id}`,
-                    `Le commentaire que vous avez laissé a été validé par l'administration. Il est désormais en ligne.`
+                    `Le commentaire que vous avez laissé a été validé par l'administration. Il est désormais en ligne.\n Le service Harmony`
                   )
+                //  succès: le commentaire a bie été validé
                   res.json({status: 200, msg: "Le commentaire a bien été validé.", result: resultModeration})
                 } else {
-                  // envoi du mail à l'auteur du commmentaire pour le prévenir que le commentaire a été validé
+                  // envoi du mail à l'auteur du commmentaire pour le prévenir que le commentaire n'a pas été validé
                   mail(
                     user[0].email,
                     `Invalidation de votre commentaire pour la réservation n°${comment[0].booking_id}`,
                     `Invalidation de votre commentaire pour la réservation n°${comment[0].booking_id}`,
-                    `Le commentaire que vous avez laissé n'a pas été validé par l'administration pour le motif suivant: « ${req.body.explanation} ». Vous pouvez modifier votre commentaire en prenant en compte cette remarque.`
+                    `Le commentaire que vous avez laissé n'a pas été validé par l'administration pour le motif suivant: « ${req.body.explanation} ». Vous pouvez modifier votre commentaire en prenant en compte cette remarque.\n Le service Harmony`
                   )
+                  // succès: le commentaire a bien été invalidé
                   res.json({status: 200, msg: "Le commentaire n'a pas été validé.", result: resultModeration})
                 }
               }
