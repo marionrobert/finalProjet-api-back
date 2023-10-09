@@ -15,7 +15,18 @@ module.exports = (app, db)=>{
     if(user.code){
         res.json({status: 500, err: user})
     } else {
-        res.json({status: 200, user: user[0]})
+        let myUser = {
+          id: user[0].id,
+          email: user[0].email,
+          firstName: user[0].firstName,
+          lastName: user[0].lastName,
+          role: user[0].role,
+          phone: user[0].phone,
+          avatar: user[0].avatar,
+          key_id: user[0].key_id,
+          points: user[0].points
+        }
+        res.json({status: 200, user: myUser})
     }
   })
 }

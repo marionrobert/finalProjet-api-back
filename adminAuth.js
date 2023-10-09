@@ -5,7 +5,6 @@ const secret = process.env.SECRET
 const adminAuth = (req, res, next) => {
     //on récupère notre token dans le header de la requète HTTP
     const token = req.headers['x-access-token']
-    // console.log("token -->", token)
 
     //si il ne trouve pas de token
     if(token === undefined){

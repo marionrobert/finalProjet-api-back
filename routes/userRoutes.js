@@ -7,6 +7,7 @@ const secret = process.env.SECRET
 // console.log("secret from userRoutes -->", secret)
 
 const mail = require('../lib/mailing');
+// authentification simple
 const withAuth = require("../withAuth")
 
 module.exports = (app, db) => {
@@ -30,7 +31,7 @@ module.exports = (app, db) => {
             req.body.email,
             "validation de votre compte Harmony",
             "Bienvenue sur Harmony",
-            `Pour valider votre compte, veuillez cliquer <a href="http://localhost:9000/api/v1/user/validate/${user.key_id}">ici</a> !`
+            `Pour valider votre compte, veuillez cliquer <a href="http://localhost:9000/api/v1/user/validate/${user.key_id}">ici</a> !\n Le service Harmony`
           )
           res.json({status: 200, msg: "Le compte utilisateur a bien été créé."})
         }
@@ -60,7 +61,7 @@ module.exports = (app, db) => {
                   let same = await bcrypt.compare(req.body.password, user[0].password)
                   //si c'est true, les mdp sont identiques
                   if(same){
-                      //on va créer le payload du token, dans ce payload on stock les valeurs qu'on va glisser dans le token (attention jamais d'infos craignos)
+                      // création du payload du token, dans ce payload on stock les valeurs qu'on va glisser dans le token
                       const payload = {email: req.body.email, id: user[0].id, role: user[0].role}
                       //on crée notre token avec sa signature (secret)
                       const token = jwt.sign(payload, secret)
@@ -76,7 +77,8 @@ module.exports = (app, db) => {
                             role: user[0].role,
                             phone: user[0].phone,
                             avatar: user[0].avatar,
-                            key_id: user[0].key_id
+                            key_id: user[0].key_id,
+                            points: user[0].points
                           }
                           res.json({status: 200, msg: "L'utilisateur est connecté", token: token, user: myUser})
                       }
@@ -130,7 +132,7 @@ module.exports = (app, db) => {
             mail(req.body.email,
               "Demande de changement de mot de passe",
               "Oups! Vous avez oublié votre mot de passe ?",
-              `Pour modifier votre mot de passe, cliquez <a href="http://localhost:9000/api/v1/user/changePassword/${userUpdated[0].key_id}">ici</a>!`
+              `Pour modifier votre mot de passe, cliquez <a href="http://localhost:9000/api/v1/user/changePassword/${userUpdated[0].key_id}">ici</a>! \n Le service Harmony`
             )
             res.json({status: 200, msg: "Email de changement de mot de passe envoyé!"})
             }
@@ -203,8 +205,10 @@ module.exports = (app, db) => {
           firstName: user[0].firstName,
           lastName: user[0].lastName,
           role: user[0].role,
+          phone: user[0].phone,
           avatar: user[0].avatar,
-          key_id: user[0].key_id
+          key_id: user[0].key_id,
+          points: user[0].points
         }
         res.json({status: 200, msg: "Image de profil modifiée.", user: myUser })
       }
@@ -225,8 +229,10 @@ module.exports = (app, db) => {
           firstName: user[0].firstName,
           lastName: user[0].lastName,
           role: user[0].role,
+          phone: user[0].phone,
           avatar: user[0].avatar,
-          key_id: user[0].key_id
+          key_id: user[0].key_id,
+          points: user[0].points
         }
         res.json({status: 200, msg: "User récupéré.", user: myUser })
       }
@@ -247,9 +253,10 @@ module.exports = (app, db) => {
           firstName: user[0].firstName,
           lastName: user[0].lastName,
           role: user[0].role,
-          avatar: user[0].avatar,
           phone: user[0].phone,
-          key_id: user[0].key_id
+          avatar: user[0].avatar,
+          key_id: user[0].key_id,
+          points: user[0].points
         }
         res.json({status: 200, msg: "User récupéré.", user: myUser })
       }
