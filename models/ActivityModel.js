@@ -21,7 +21,7 @@ class ActivityModel {
   //récupération de toutes les activités "en ligne"
   static async getAllOnlineActivities(){
     console.log("hello from getAllOnelineActivities")
-    return db.query("SELECT * FROM activities WHERE status=? ORDER BY updatingTimestamps DESC", ["en ligne"])
+    return db.query("SELECT * FROM activities WHERE status=? ORDER BY updatingTimestamps DESC", ["online"])
     .then((res)=>{
       // console.log("res de la requête sql getAllOnlineActivities -->", res)
       return res
@@ -34,7 +34,7 @@ class ActivityModel {
 
   //récupération de toutes les activités "en attente de validation"
   static async getAllWaitingActivities(){
-    return db.query("SELECT * FROM activities WHERE status=?", ["en attente de validation"])
+    return db.query("SELECT * FROM activities WHERE status=?", ["waiting_for_validation"])
     .then((res)=>{
       // console.log("res de la requête sql getAllWaitingActivities -->", res)
       return res
@@ -87,7 +87,7 @@ class ActivityModel {
   //création d'une activité
   static async saveOneActivity(req){
     let sql = "INSERT INTO activities (category_id, author_id, authorIsProvider, title, description, address, zip, city, lat, lng, status, duration, points, urlPicture, creationTimestamps, updatingTimestamps) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?, ?, Now(), Now())"
-    return db.query(sql, [req.body.category_id, req.body.author_id, req.body.authorIsProvider, req.body.title, req.body.description, req.body.address, req.body.zip, req.body.city, req.body.lat, req.body.lng, "en attente de validation", req.body.duration, req.body.points, req.body.urlPicture])
+    return db.query(sql, [req.body.category_id, req.body.author_id, req.body.authorIsProvider, req.body.title, req.body.description, req.body.address, req.body.zip, req.body.city, req.body.lat, req.body.lng, "waiting_for_validation", req.body.duration, req.body.points, req.body.urlPicture])
     .then((res)=>{
       console.log("res de la requête sql saveOneActivity -->", res)
       return res
@@ -101,7 +101,7 @@ class ActivityModel {
   //modification d'une activité
   static async updateOneActivity(req, id){
     let sql = "UPDATE activities SET category_id=?, authorIsProvider=?, title=?, description=?, address=?, zip=?, city=?, lat=?, lng=?, status=?, duration=?, points=?, urlPicture=?, updatingTimestamps=? WHERE id=?"
-    return db.query(sql, [req.body.category_id, req.body.authorIsProvider, req.body.title, req.body.description, req.body.address, req.body.zip, req.body.city, req.body.lat, req.body.lng, "en attente de validation", req.body.duration, req.body.points, req.body.urlPicture, new Date(), id])
+    return db.query(sql, [req.body.category_id, req.body.authorIsProvider, req.body.title, req.body.description, req.body.address, req.body.zip, req.body.city, req.body.lat, req.body.lng, "waiting_for_validation", req.body.duration, req.body.points, req.body.urlPicture, new Date(), id])
     .then((res)=>{
       console.log("res de la requête sql updateOneActivity -->", res)
       return res
@@ -153,9 +153,9 @@ class ActivityModel {
 
   // filter les activités
   static async getActivitiesByFilter(req){
-    let condition = " WHERE status='en ligne'"
+    let condition = " WHERE status='online'"
     console.log("req dans getActivitiesByFilter -->", req)
-    // FORMAT DE LA REQUETE SQl A OBTENIR : SELECT * FROM activities WHERE status = 'en ligne' AND authorIsProvider = true/false AND category_id IN (2, 3, 7, 9) AND points BETWEEN min_points AND max_points AND duration BETWEEN min_duration AND max_duration;
+    // FORMAT DE LA REQUETE SQl A OBTENIR : SELECT * FROM activities WHERE status = 'online' AND authorIsProvider = true/false AND category_id IN (2, 3, 7, 9) AND points BETWEEN min_points AND max_points AND duration BETWEEN min_duration AND max_duration;
 
     //si l'utilisateur a choisi des catégories -- format d'un array contenant les id des catégories choisies
     if(req.body.categories){
@@ -226,7 +226,7 @@ class ActivityModel {
 
   //mise à jour de la photo
   static async updatePicture(picture, id){
-    return db.query("UPDATE activities SET urlPicture = ?, status=? WHERE id = ?", [picture, "en attente de validation", id])
+    return db.query("UPDATE activities SET urlPicture = ?, status=? WHERE id = ?", [picture, "waiting_for_validation", id])
     .then((res)=>{
       console.log("res de requête sql updatePicture -->", res)
       return res

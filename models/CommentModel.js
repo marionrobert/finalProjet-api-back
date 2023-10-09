@@ -20,7 +20,7 @@ class CommentModel {
 
   // récupération de tous les commentaires en attente de validation par l'admin
   static async getAllWaitingComments(){
-    return db.query("SELECT * FROM comments WHERE status=?", ["en attente de validation"])
+    return db.query("SELECT * FROM comments WHERE status=?", ["waiting_for_validation"])
     .then((res)=>{
       // console.log("res de la requête sql getAllWaitingComments -->", res)
       return res
@@ -59,7 +59,7 @@ class CommentModel {
 
   // récupération des commentaires liés à une activité qui ont été validés par l'admin
   static async getAllCommentsByActivityId(activity_id){
-    return db.query("SELECT * FROM comments WHERE activity_id=? AND status=?", [activity_id, "validé"])
+    return db.query("SELECT * FROM comments WHERE activity_id=? AND status=?", [activity_id, "validated"])
     .then((res)=>{
       // console.log("res de la requête sql getAllCommentsByActivityId -->", res)
       return res
@@ -72,7 +72,7 @@ class CommentModel {
 
   //récupération des commentaires qui ont une note élevée (page d'accueil)
   static async getAllHighScoreComments(){
-    return db.query("SELECT * FROM comments WHERE score >= ? AND status=?", [4, "validé"])
+    return db.query("SELECT * FROM comments WHERE score >= ? AND status=?", [4, "validated"])
     .then((res)=>{
       // console.log("res de la requête sql getAllHighScoreComments -->", res)
       return res
@@ -113,7 +113,7 @@ class CommentModel {
   // mise à jour d'un commentaire
   static async updateOneComent(req, id){
     let sql = "UPDATE comments SET title=?, content=?, status=?, score=? WHERE id=?"
-    return db.query(sql, [req.body.title, req.body.content, "en attente de validation", req.body.score, id])
+    return db.query(sql, [req.body.title, req.body.content, "waiting_for_validation", req.body.score, id])
     .then((res)=>{
       console.log("res de la requête sql updateOneComent -->", res)
       return res

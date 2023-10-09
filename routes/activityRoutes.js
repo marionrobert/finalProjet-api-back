@@ -200,7 +200,7 @@ module.exports = (app, db) => {
                 // erreur
                 res.json({status: 500, msg: "Erreur de mise à jour du statut de l'activité. Le processus de modération de l'activité n'a pas pu aboutir.", err: resultModeration})
               } else {
-                if (req.body.status === "invalidé"){
+                if (req.body.status === "invalidated"){
                   // l'admin invalide l'activité, le créateur de l'activité est prévenu par mail
                   mail(
                     user[0].email,

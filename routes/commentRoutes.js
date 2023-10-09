@@ -147,7 +147,7 @@ module.exports = (app,db) => {
       if(booking.length === 0){
         res.json({status: 204, msg:"Il n'existe pas de réservation correspond à l'id renseigné."})
       } else {
-        if (booking[0].booking_status !== "terminée"){
+        if (booking[0].booking_status !== "finished"){
           res.json({status: 401, msg:"Vous ne pouvez pas laissé un commentaire tant que l'activité n'a pas été réalisée."})
         } else {
           let commentAlreadyExisting = await commentModel.getOneCommentByBookingId(req.body.booking_id)
@@ -189,7 +189,7 @@ module.exports = (app,db) => {
         if (comment.length === 0){
           res.json({status: 204, msg: "Il n'existe pas de commentaire lié à cet id."})
         } else {
-          if (comment[0].status === "validé"){
+          if (comment[0].status === "validated"){
             res.json({status: 401, msg:"Le commentaire a déjà été validé par l'administration, vous ne pouvez plus le modifier."})
           } else {
             // si le commentaire n'est as encore validé, possibilité de la modifier
@@ -251,7 +251,7 @@ module.exports = (app,db) => {
               if (user.length === 0){
                 res.json({status: 401, msg: "L'utilisateur n'a pas été retrouvé. Aucun email n'a pu lui être envoyé."})
               } else {
-                if (req.body.status === "validé"){
+                if (req.body.status === "validated"){
                   // envoi du mail à l'auteur du commmentaire pour le prévenir que le commentaire a été validé
                   mail(
                     user[0].email,

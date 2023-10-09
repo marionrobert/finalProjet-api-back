@@ -161,7 +161,7 @@ module.exports = (app, db)=>{
       } else {
         // console.log("le booking a été récupéré -->", booking[0])
         // si la réservation est en attente d'acceptation
-        if (booking[0].booking_status === "en attente d'acceptation"){
+        if (booking[0].booking_status === "waiting_for_acceptance"){
           // cas où l'utilisateur qui a réservé l'activité est aussi le fournisseur : il donne un coup de main
           // il n'y a pas eu de paiement lors de la réservation --> pour pouvoir accepter la réservation, le bénéficiaire de l'activité doit avoir un solde de points suffisant
           if (booking[0].booker_id === booking[0].provider_id){
@@ -230,7 +230,7 @@ module.exports = (app, db)=>{
         res.json({status: 500, msg: "Erreur de récupération de la réservation.", err: booking})
       } else {
         // console.log("booking -->", booking[0])
-        if (booking[0].booking_status === "en attente d'acceptation"){
+        if (booking[0].booking_status === "waiting_for_acceptance"){
           // console.log("on peut commencer le processus,je récupère le booker")
           // récupération du réservant par son id
           let booker = await userModel.getOneUserById(booking[0].booker_id)
@@ -314,7 +314,7 @@ module.exports = (app, db)=>{
           res.json({status: 204, msg: "Aucune réservation ne correspond à cet id.", booking: booking})
         } else {
           // si la réservation n'est pas en attente de réalisation
-          if (booking[0].booking_status !== "en attente de réalisation" ){
+          if (booking[0].booking_status !== "waiting_for_completion" ){
             res.json({status: 401, msg: "Cette action ne peut pas être réalisée: la réservation est toujours en attente d'acceptation ou est terminée."})
           } else { // la réservation est en attente de réalisation
             //  récupération du fournisseur de l'activité
@@ -404,7 +404,7 @@ module.exports = (app, db)=>{
           res.json({status: 401, msg: "Aucune réservation ne correspond à cet id.", booking: booking})
         } else {
           // la réservation n'est pas en attente de réalisation
-          if (booking[0].booking_status !== "en attente de réalisation"){
+          if (booking[0].booking_status !== "waiting_for_completion"){
             res.json({status: 401, msg: "Cette action ne peut pas être réalisée: la réservation est toujours en attente d'acceptation ou est terminée."})
           } else { // la réservation est en attente de réalisation
             //  récupération du fournisseur de l'activité
