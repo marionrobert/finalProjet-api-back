@@ -194,12 +194,12 @@
         <label>Entrez votre mot de passe deux fois.</label>
         <input type="password" name="password1" placeholder="Entrez votre nouveau mot de passe" required />
         <input type="password" name="password2" placeholder="Retapez-le à l'identique" required/>
-        <button>Envoyer</button>
+        <button aria-label="Envoyer le nouveau mot de passe">Envoyer</button>
       </form>
       <% if(info !== null) { %>
         <div class="result">
           <p style="color:seagreen"><%= info %></p>
-          <button><a href="http://127.0.0.1:5173/login">Me connecter</a></button>
+          <button aria-label="Me connecter"><a href="http://127.0.0.1:5173/login">Me connecter</a></button>
         </div>
       <% } %>
       <% if(error !== null) { %>
