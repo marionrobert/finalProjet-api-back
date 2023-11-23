@@ -5,6 +5,7 @@ const secret = process.env.SECRET
 const withAuth = (req, res, next) => {
     //on récupère notre token dans le header de la requète HTTP
     const token = req.headers['x-access-token']
+    //à terme, faire évoiler vers : authorization: "Bearer + token"
 
     //s'il ne trouve pas de token
     if(token === undefined){

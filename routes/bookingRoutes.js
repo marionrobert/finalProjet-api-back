@@ -147,7 +147,7 @@ module.exports = (app, db)=>{
     }
   })
 
-  // route de modification du statut d'une réservation - route protégée
+  // route d'acceptation d'une réservation - route protégée
   app.put("/api/v1/booking/accept-booking/:id", withAuth, async(req,res,next)=>{
     // contrôle du type de l'id renseigné
     if (isNaN(req.params.id)){
@@ -191,7 +191,7 @@ module.exports = (app, db)=>{
                         res.json({status: 500, msg: "Erreur de changement du statut de la réservation.", err: bookingUpdated})
                       } else {
                         // succès
-                        res.json({status: 200, msg: `La réservation a bien été acceptée. Votre solde de points a été débité de ${booking[0].points} points.`, bookingUpdated: bookingUpdated})
+                        res.json({status: 200, msg: `La réservation a bien été acceptée. Le solde de points a été débité de ${booking[0].points} points.`, bookingUpdated: bookingUpdated})
                       }
                     }
                 } else {
@@ -219,7 +219,7 @@ module.exports = (app, db)=>{
     }
   })
 
-  // route de suppression/refus d'une réservation - route protégée
+  // route d'annulation/refus d'une réservation - route protégée
   app.delete("/api/v1/booking/delete/:id", withAuth, async(req,res,next)=>{
     // contrôle du type de l'id renseigné
     if (isNaN(req.params.id)){
@@ -430,7 +430,7 @@ module.exports = (app, db)=>{
                   } else {
                     // aucun résultat trouvé
                     if (bookingAfterValidation.length === 0) {
-                      res.json({status: 401, msg: "Aucune réservation ne correspond à cet id.", booking: bookingAfterValidation[0]})
+                      res.json({status: 204, msg: "Aucune réservation ne correspond à cet id.", booking: bookingAfterValidation[0]})
                     } else {
                       // si les deux utilisateurs ont validé la réalisation, alors on peut créditer les points au fournisseur de l'activité
                       if (bookingAfterValidation[0].providerValidation && bookingAfterValidation[0].beneficiaryValidation){

@@ -155,10 +155,17 @@
     <header>
       <nav id="navbar-menu">
         <div id="brand">
+          <!-- localhost -->
           <a href="http://127.0.0.1:5173/">
             <img src="/images/icons/lifetree.avif" class="brand-icon" alt="Logo arbre de vie"/>
           </a>
           <a href="http://127.0.0.1:5173/"><span>Harmony</span></a>
+
+          <!-- ide -->
+          <!-- <a href="http://marionrobert.ide.3wa.io:9500/">
+            <img src="/images/icons/lifetree.avif" class="brand-icon" alt="Logo arbre de vie"/>
+          </a>
+          <a href="http://marionrobert.ide.3wa.io:9500/"><span>Harmony</span></a> -->
         </div>
       </nav>
     </header>
@@ -167,7 +174,10 @@
       <% if(info !== null) { %>
         <div class="result">
           <p><%= info %></p>
-          <button><a href="http://127.0.0.1:5173/login">Me connecter</a></button>
+          <!-- localhost -->
+          <button aria-label="Me connecter"><a href="http://127.0.0.1:5173/login">Me connecter</a></button>
+          <!-- ide -->
+          <!-- <button aria-label="Me connecter"><a href="http://marionrobert.ide.3wa.io:9500/login">Me connecter</a></button> -->
         </div>
       <% } %>
       <% if(error !== null) { %>

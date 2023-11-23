@@ -134,6 +134,7 @@ class UserModel {
     })
   }
 
+  // modification de la photo d'un utilisateur
   static async updateAvatar(avatar, key_id){
     return db.query("UPDATE users SET avatar = ? WHERE key_id = ?", [avatar, key_id])
     .then((res)=>{
@@ -146,6 +147,7 @@ class UserModel {
     })
   }
 
+  // augmentation des points d'un utilisateur
   static async increasePoints(points, id){
     return db.query("UPDATE users SET points= points + ? WHERE id=?", [points, id])
     .then((res)=>{
@@ -158,6 +160,7 @@ class UserModel {
     })
   }
 
+  // diminution des points d'un utilisateur
   static async decreasePoints(points, id){
     return db.query("UPDATE users SET points= points - ? WHERE id=?", [points, id])
     .then((res)=>{
@@ -170,6 +173,7 @@ class UserModel {
     })
   }
 
+  // récupération d'un utilisateur par son id
   static async getOneUserById(id){
     // console.log("hello from getOneUserById")
     return db.query("SELECT * FROM users WHERE id = ?", [id])
