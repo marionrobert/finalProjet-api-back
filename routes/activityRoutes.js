@@ -55,6 +55,7 @@ module.exports = (app, db) => {
       if (activities.length === 0){
         res.json({status: 204, msg: "Il n'existe pas d'activité en attente de validation.", activities: activities})
       } else {
+         // retour avec les activités trouvées
         res.json({status: 200, msg: "Les activités en attente de validation ont bien été récupérées.", activities: activities})
       }
     }
@@ -62,11 +63,14 @@ module.exports = (app, db) => {
 
   //route de récupération de toutes les activités créées par un même auteur - route protégée
   app.get("/api/v1/activity/all/author/:author_id", withAuth, async(req, res, next)=>{
+      // vérification que l'id renseigné est bien un nombre
     if (isNaN(req.params.author_id)){
       res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
     } else {
+      // récupération de toutes les activités créées par un même auteur
       let activities = await activityModel.getAllActivitiesByAuthor(req.params.author_id)
       if (activities.code){
+        // erreur
         res.json({status: 500, msg: "Erreur de récupération des activités de l'auteur.", err: activities})
       } else {
         // aucun résultat --> code 204
@@ -173,6 +177,7 @@ module.exports = (app, db) => {
   //route de modération de l'activité par l'admin : mise à jour du statut (en attente de validation --> validé/en ligne) - route admin
   app.put("/api/v1/activity/moderate/:id", adminAuth, async(req, res, next)=>{
     if (isNaN(req.params.id)){
+      // vérification que l'id renseigné est bien un nombre
       res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
     } else {
       // récupération de l'activité par son ID

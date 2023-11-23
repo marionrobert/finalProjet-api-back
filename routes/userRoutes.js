@@ -31,7 +31,7 @@ module.exports = (app, db) => {
             req.body.email,
             "validation de votre compte Harmony",
             "Bienvenue sur Harmony",
-            `Pour valider votre compte, veuillez cliquer <a href="http://localhost:9000/api/v1/user/validate/${user.key_id}">ici</a> !\n Le service Harmony`
+            `Pour valider votre compte, veuillez cliquer <a href="http://marionrobert.ide.3wa.io:9000/api/v1/user/validate/${user.key_id}">ici</a> !\n Le service Harmony`
           )
           res.json({status: 200, msg: "Le compte utilisateur a bien été créé."})
         }
@@ -132,7 +132,7 @@ module.exports = (app, db) => {
             mail(req.body.email,
               "Demande de changement de mot de passe",
               "Oups! Vous avez oublié votre mot de passe ?",
-              `Pour modifier votre mot de passe, cliquez <a href="http://localhost:9000/api/v1/user/changePassword/${userUpdated[0].key_id}">ici</a>! \n Le service Harmony`
+              `Pour modifier votre mot de passe, cliquez <a href="http://marionrobert.ide.3wa.io:9000/api/v1/user/changePassword/${userUpdated[0].key_id}">ici</a>! \n Le service Harmony`
             )
             res.json({status: 200, msg: "Email de changement de mot de passe envoyé!"})
             }
