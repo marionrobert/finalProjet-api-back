@@ -31,7 +31,7 @@ module.exports = (app, db) => {
             req.body.email,
             "validation de votre compte Harmony",
             "Bienvenue sur Harmony",
-            //lolalhost
+            //localhost
             `Pour valider votre compte, veuillez cliquer <a href="http://localhost:9000/api/v1/user/validate/${user.key_id}">ici</a> !\n Le service Harmony`
             // ide
             // `Pour valider votre compte, veuillez cliquer <a href="http://marionrobert.ide.3wa.io:9000/api/v1/user/validate/${user.key_id}">ici</a> !\n Le service Harmony`
