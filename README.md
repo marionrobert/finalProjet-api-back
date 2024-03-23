@@ -44,23 +44,35 @@ Voici la liste des packages et leur version utilisés dans ce projet :
    - `SECRET` pour signer et vérifier les JSON Web Tokens (JWT)
    - `GOOGLE_CLIENT_ID` et `GOOGLE_CLIENT_SECRET` pour l'envoie des mails de confirmation liés à la gestion des comptes (confirmation de création, changement de mot de pase). Pour obtenir ces deux informations, vous devez vous créer un compte sur [Google for developpers](https://developers.google.com/?hl=fr)
 5. Pou l'envoi des mails, vous aurez besoin de mettre à jour les variables `resfreshToken` et`accessToken` dans le fichier `lib/mailing.js`.
-   Pour obtenir ces deux informations, vous devez vous connecter à l'url suivante : https://developers.google.com/oauthplayground/, sélectionner le service **GMAIL API v1 > https://mail.google.com/** , puis cliquer sur le bouton "Authorize API", puis sur les boutons "Exchange authorization code for tokens". Dnas l'onglet "Exchange authorization code for tokens", vous pourrez ainsi retrouver le freshToken et l'accessToken. Ils sont valables pour une durée de 3600 secondes soit 1h. Pour renouveler les tokens, il faudra de nouveau cliquer sur le bouton "Exchange authorization code for tokens".
+   Pour obtenir ces deux informations, vous devez vous connecter à l'url suivante : https://developers.google.com/oauthplayground/, sélectionner le service **GMAIL API v1 > https://mail.google.com/** , puis cliquer sur le bouton "Authorize API", puis sur les boutons "Exchange authorization code for tokens". Dans l'onglet "Exchange authorization code for tokens", vous pourrez ainsi retrouver le freshToken et l'accessToken. Ils sont valables pour une durée de 3600 secondes soit 1h. Pour renouveler les tokens, il faudra de nouveau cliquer sur le bouton "Exchange authorization code for tokens".
 6. Créez les fichiers **config.js** (pour le production) et **config-offline.js** (pour le développement) à la racine de votre projet pour y mettre les informations concernant votre DB.
    ```
    module.exports = {
-    db: {
-        host: "YOUR HOST",
-        database: "YOUR DB",
-        user: "YOUR USER",
-        password: "YOUR PASSWORD"
-    }
-  }
+       db: {
+            host: "YOUR HOST",
+            database: "YOUR DB",
+            user: "YOUR USER",
+            password: "YOUR PASSWORD"
+        }
+   };
    ```
+
 8. Pour démarrer le serveur, vous avez deux options :
    - `npm start`
    - `npm dev` : cette deuxième option utilise nodemon pour actualiser le serveur à chaque modification de votre code
 
-   
+<br/>
+
+## Contenu des fichiers et fonctionnement
+
+Le projet est organisé comme suit : 
+- dossier **lib** contenant le fichier **mailing.js** pour la gestion de l'envoie des mails avec les bilothèques nodemailer et googleapis.
+- dossier **models** contenant l'ensemble des modèles : ActivityMoel, BookingModel, CategoryModel, CommentModel, UserModel. Ces fichiers définissent des méthodes pour interagir avec la base de données et effectuer des opérations telles que la récupération, la création, la mise à jour et la suppression des entrées.
+- dossier **routes** content l'ensemble des fichiers de routes : activityRoutes.js, authRoutes.js, bookingRoutes.js, categoryRoutes.js, commentRoutes.js
+- dossier **public**
+- dossier **views** contenant les views pour la confirmation de la création du compte et le changement de mot de passe.
+- les middlewares **withAuth** et **adminAuth** utilisés pour authentifier les utilisateurs et pour s'assurer qu'ils ont les autorisations nécessaires pour accéder à certaines routes.
+
 <br/>
 
 ## Dossier lié
