@@ -63,17 +63,19 @@ Voici la liste des packages et leur version utilisés dans ce projet :
 
 <br/>
 
-## Contenu des fichiers et fonctionnement
+## Contenu des fichiers 📁🗃️
 
-Le projet est organisé comme suit : 
-- dossier **lib** contenant le fichier **mailing.js** pour la gestion de l'envoie des mails avec les bilothèques nodemailer et googleapis.
-- dossier **models** contenant l'ensemble des modèles : ActivityMoel, BookingModel, CategoryModel, CommentModel, UserModel. Ces fichiers définissent des méthodes pour interagir avec la base de données et effectuer des opérations telles que la récupération, la création, la mise à jour et la suppression des entrées.
-- dossier **routes** content l'ensemble des fichiers de routes : activityRoutes.js, authRoutes.js, bookingRoutes.js, categoryRoutes.js, commentRoutes.js
-- dossier **public**
-- dossier **views** contenant les views pour la confirmation de la création du compte et le changement de mot de passe.
-- les middlewares **withAuth** et **adminAuth** utilisés pour authentifier les utilisateurs et pour s'assurer qu'ils ont les autorisations nécessaires pour accéder à certaines routes.
+Le projet est organisé en plusieurs dossiers : 
+- **lib**: ce dossier contient le fichier **mailing.js** pour la gestion de l'envoie des mails avec les bilothèques *nodemailer* et *googleapis*.
+- **models** : ce dossier contient l'ensemble des modèles de données : *ActivityModel, BookingModel, CategoryModel, CommentModel, UserModel*. Ces fichiers définissent des méthodes pour interagir avec la base de données et effectuer des opérations telles que la récupération, la création, la mise à jour et la suppression des entrées.
+- **routes** : Ce dossier contient les fichiers de configuration des routes de l'API REST de l'application, tels que `activityRoutes.js`, `authRoutes.js`, `bookingRoutes.js`, `categoryRoutes.js` et `commentRoutes.js`. Chaque fichier définit des routes pour différentes fonctionnalités de l'application, en appelant les méthodes appropriées des modèles.
+    - Par exemple, pour le fichier `activityRoutes`, les routes incluent la récupération de toutes les activités, la récupération des activités en ligne, la récupération des activités en attente de validation, la récupération des activités créées par un auteur spécifique, la création, la mise à jour, et la suppression d'activités, etc. Pour certaines routes sensibles, telles que la création, la mise à jour et la suppression d'activités, ainsi que la modération d'activités par un administrateur, il utilise les middlewares withAuth et adminAuth pour assurer que l'utilisateur est authentifié et possède les autorisations nécessaires le cas échéant.
+    - Particularité du fichier `authRoutes.js` : ce fichier gère la route liée à l'authentification dans l'application *GET /api/v1/user/checkToken* qui permet à un utilisateur authentifié de vérifier son token d'authentification et de récupérer ses informations d'utilisateur associées à partir de la base de données. Cela facilite la reconnexion automatique du frontend et permet de maintenir une session utilisateur active.
+- **public** : il contient les ressources statiques, des images principales, car le css, peu conséquent, a été intégré directement dans les vues.
+- **views** : il contient les views pour la confirmation de la création du compte et le changement de mot de passe. Elles sont composées de la structure html de le la page et du css associé.
+- les fichiers middlewares **withAuth** et **adminAuth** utilisés pour authentifier les utilisateurs et pour s'assurer qu'ils ont les autorisations nécessaires pour accéder à certaines routes.
 
 <br/>
 
-## Dossier lié
+## Dossier lié 🔗
 La partie front-end de l'application est accessible [ici](https://github.com/marionrobert/harmony-front-react/tree/main)
