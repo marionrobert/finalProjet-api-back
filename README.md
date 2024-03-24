@@ -78,4 +78,4 @@ Le projet est organisé en plusieurs dossiers :
 <br/>
 
 ## Dossier lié 🔗
-La partie front-end de l'application est accessible [ici](https://github.com/marionrobert/harmony-front-react/tree/main)
+La partie front-end de l'application est accessible [ici](https://github.com/marionrobert/harmony-front-react)
