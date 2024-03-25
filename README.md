@@ -39,7 +39,7 @@ Voici la liste des packages et leur version utilisés dans ce projet :
 ### Étapes d'installation :
 1. Clonez le dépôt Git : `git clone https://github.com/marionrobert/finalProjet-api-back.git`
 2. Assurez-vous d'avoir la stack technologique installée avec les bonnes versions.
-3. Lancer la commande `npm install` pour installer les dépendences.
+3. Lancer la commande `npm install` pour installer les dépendances.
 4. Créez un fichier **.env** à la racine du projet et ajoutez-y les variables d'environnement suivantes :
    - `SECRET` pour signer et vérifier les JSON Web Tokens (JWT)
    - `GOOGLE_CLIENT_ID` et `GOOGLE_CLIENT_SECRET` pour l'envoie des mails de confirmation liés à la gestion des comptes (confirmation de création, changement de mot de pase). Pour obtenir ces deux informations, vous devez vous créer un compte sur [Google for developpers](https://developers.google.com/?hl=fr)
