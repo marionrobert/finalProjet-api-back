@@ -45,9 +45,12 @@ Voici la liste des packages et leur version utilisés dans ce projet :
 4. Créez un fichier **.env** à la racine du projet et ajoutez-y les variables d'environnement suivantes :
    - `SECRET` pour signer et vérifier les JSON Web Tokens (JWT)
    - `GOOGLE_CLIENT_ID` et `GOOGLE_CLIENT_SECRET` pour l'envoie des mails de confirmation liés à la gestion des comptes (confirmation de création, changement de mot de pase). Pour obtenir ces deux informations, vous devez vous créer un compte sur [Google for developpers](https://developers.google.com/?hl=fr)
-5. Pou l'envoi des mails, vous aurez besoin de mettre à jour les variables `resfreshToken` et`accessToken` dans le fichier `lib/mailing.js`.
+5. Pour l'envoi des mails, vous aurez besoin de mettre à jour les variables `resfreshToken` et`accessToken` dans le fichier `lib/mailing.js`.
    Pour obtenir ces deux informations, vous devez vous connecter à l'url suivante : https://developers.google.com/oauthplayground/, sélectionner le service **GMAIL API v1 > https://mail.google.com/** , puis cliquer sur le bouton "Authorize API", puis sur les boutons "Exchange authorization code for tokens". Dans l'onglet "Exchange authorization code for tokens", vous pourrez ainsi retrouver le freshToken et l'accessToken. Ils sont valables pour une durée de 3600 secondes soit 1h. Pour renouveler les tokens, il faudra de nouveau cliquer sur le bouton "Exchange authorization code for tokens".
-6. Créez les fichiers **config.js** (pour le production) et **config-offline.js** (pour le développement) à la racine de votre projet pour y mettre les informations concernant votre DB.
+6. Création et connection à la base de données :
+   - vous devez avoir un logiciel de base de données (comme MySQL Workbench, phpMyAdmin, etc.).
+   - importez le fichier `marionrobert_3waproject` dans vle logiciel de base de données et exécuter l'importation. Vérifier que la base de données a bien été créée.
+   - Créez les fichiers **config.js** (pour le production) et **config-offline.js** (pour le développement) à la racine de votre projet pour y mettre les informations concernant votre DB.
    ```
    module.exports = {
        db: {
@@ -58,10 +61,19 @@ Voici la liste des packages et leur version utilisés dans ce projet :
         }
    };
    ```
-
-8. Pour démarrer le serveur, vous avez deux options :
+7. Pour démarrer le serveur, vous avez deux options :
    - `npm start`
    - `npm dev` : cette deuxième option utilise nodemon pour actualiser le serveur à chaque modification de votre code
+  
+8. Pour prendre en main l'application, voici des identifiants de connexion :
+    - Compte administrateur :
+        - Adresse e-mail : admin-harmony@gmail.com
+        - Mot de passe : AqwPM741*
+    - Compte utilisateur :
+        - Adresse e-mail : user-test-harmony@hotmail.fr
+        - Mot de passe : Azerty123*
+
+Pour tester toutes les fonctionnalités de l'application, notamment l'envoi d'e-mails à l'utilisateur, veuillez remplacer, directement dans la base de données, l'adresse e-mail factice par une adresse e-mail réelle ou créez un nouveau compte.
 
 <br/>
 
