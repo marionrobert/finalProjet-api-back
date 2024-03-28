@@ -49,7 +49,7 @@ Voici la liste des packages et leur version utilisés dans ce projet :
    Pour obtenir ces deux informations, vous devez vous connecter à l'url suivante : https://developers.google.com/oauthplayground/, sélectionner le service **GMAIL API v1 > https://mail.google.com/** , puis cliquer sur le bouton "Authorize API", puis sur les boutons "Exchange authorization code for tokens". Dans l'onglet "Exchange authorization code for tokens", vous pourrez ainsi retrouver le freshToken et l'accessToken. Ils sont valables pour une durée de 3600 secondes soit 1h. Pour renouveler les tokens, il faudra de nouveau cliquer sur le bouton "Exchange authorization code for tokens".
 6. **Création et connection à la base de données** :
    - vous devez avoir un logiciel de base de données (comme MySQL Workbench, phpMyAdmin, etc.).
-   - importez le fichier **marionrobert_3waproject.sql** dans vle logiciel de base de données et exécuter l'importation. Vérifier que la base de données a bien été créée.
+   - importez le fichier **marionrobert_3waproject.sql** dans le logiciel de base de données et exécuter l'importation. Vérifier que la base de données a bien été créée.
    - Créez les fichiers **config.js** (pour le production) et **config-offline.js** (pour le développement) à la racine de votre projet pour y mettre les informations concernant votre DB.
    ```
    module.exports = {
