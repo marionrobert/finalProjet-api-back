@@ -1,3 +1,5 @@
+(english below)
+
 # Bienvenue sur *Harmony* : Apprenez à connaître vos voisins en échangeant des coups de main ! 🌳🌞🤝
 <img src="/public/screenshots/banner.png" alt="bannière de l'application web">
 
@@ -20,7 +22,7 @@ L'application tourne actuellement sur :
 - Npm (version 8.11.0)
 
 Voici la liste des packages et leur version utilisés dans ce projet : 
-```
+```javascript
 "dependencies": {
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
@@ -51,7 +53,7 @@ Voici la liste des packages et leur version utilisés dans ce projet :
    - vous devez avoir un logiciel de base de données (comme MySQL Workbench, phpMyAdmin, etc.).
    - importez le fichier **marionrobert_3waproject.sql** dans le logiciel de base de données et exécuter l'importation. Vérifier que la base de données a bien été créée.
    - Créez les fichiers **config.js** (pour le production) et **config-offline.js** (pour le développement) à la racine de votre projet pour y mettre les informations concernant votre DB.
-   ```
+   ```javascript
    module.exports = {
        db: {
             host: "YOUR HOST",
@@ -93,3 +95,96 @@ Le projet est organisé en plusieurs dossiers :
 
 ## Dossier lié 🔗
 La partie front-end de l'application est accessible [ici](https://github.com/marionrobert/harmony-front-react)
+
+---
+---
+# Welcome to *Harmony*: Get to Know Your Neighbors by Exchanging Helping Hands! 🌳🌞🤝
+![Banner](/public/screenshots/banner.png)
+
+Harmony was born from a simple observation. People with international protection are likely to settle permanently in France due to their situation, but they often struggle to integrate. We believe that their integration can be facilitated at the city level. Unfortunately, there is generally a lack of social interactions between long-time residents and newly arrived protected individuals. This is a direct result of unfamiliarity with each other and preconceived ideas. The goal of our project is to promote the inclusion of protected individuals by developing exchanges and solidarity among residents of the same city. This solidarity will come from exchanging helping hands between neighbors. On our site, you can propose and/or book an activity to give and/or receive a helping hand from your neighbors. By doing a helping hand for someone, you earn points that you can later use to get help from other users.
+
+This repository is dedicated to the **backend part** of the project.
+
+## Development Context 💻
+This is an educational project developed as the final project of the "FullStack Javascript Web Developer" training at 3w Academy.
+
+## Installation and Configuration ⚙️🛠️
+
+### System Requirements:
+The application currently runs on:
+- Node.js (version 16.15.1)
+- Npm (version 8.11.0)
+
+Here is the list of packages and their versions used in this project:
+```javascript
+"dependencies": {
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-fileupload": "^1.4.0",
+    "googleapis": "^123.0.0",
+    "jsonwebtoken": "^9.0.1",
+    "nodemailer": "^6.9.4",
+    "nodemon": "^3.0.1",
+    "promise-mysql": "^5.2.0",
+    "random-id": "^1.0.4"
+  }
+```
+<br/>
+
+### Installation Steps:
+1. Clone the Git repository: `git clone https://github.com/marionrobert/finalProjet-api-back.git`
+2. Make sure you have the required technology stack installed with the correct versions.
+3. Run the command `npm install` to install dependencies.
+4. Create a **.env** file at the root of the project and add the following environment variables:
+   - `SECRET` to sign and verify JSON Web Tokens (JWT)
+   - `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` for sending confirmation emails related to account management (account creation confirmation, password change). To obtain this information, you need to create an account on [Google for Developers](https://developers.google.com/?hl=en).
+5. For sending emails, you'll need to update the `refreshToken` and `accessToken` variables in the `lib/mailing.js` file.
+   To obtain these, you need to visit [OAuth 2.0 Playground](https://developers.google.com/oauthplayground/), select **GMAIL API v1 > https://mail.google.com/** service, click on "Authorize API," and then "Exchange authorization code for tokens." In the "Exchange authorization code for tokens" tab, you can find the refreshToken and accessToken. They are valid for 3600 seconds (1 hour). To refresh the tokens, you'll need to click "Exchange authorization code for tokens" again.
+6. **Database Creation and Connection**:
+   - You need a database software (like MySQL Workbench, phpMyAdmin, etc.).
+   - Import the **marionrobert_3waproject.sql** file into the database software and execute the import. Verify that the database has been created.
+   - Create the **config.js** (for production) and **config-offline.js** (for development) files at the root of your project to store your DB information.
+   ```javascript
+   module.exports = {
+       db: {
+            host: "YOUR HOST",
+            database: "YOUR DB",
+            user: "YOUR USER",
+            password: "YOUR PASSWORD"
+        }
+   };
+   ```
+7. To start the server, you have two options:
+   - `npm start`
+   - `npm dev`: this second option uses nodemon to refresh the server with each code modification.
+
+8. To get started with the application, here are the login credentials:
+    - **Admin Account**:
+        - Email Address: admin-harmony@gmail.com
+        - Password: AqwPM741*
+    - **User Account**:
+        - Email Address: user-test-harmony@hotmail.fr
+        - Password: Azerty123*
+
+To test all the functionalities of the application, including sending emails to the user, please replace the fake email address directly in the database with a real email address or create a new account.
+
+## File Contents 📁🗃️
+
+The project is organized into several folders:
+- **lib**: This folder contains the **mailing.js** file for managing email sending with the *nodemailer* and *googleapis* libraries.
+- **models**: This folder contains all the data models: *ActivityModel, BookingModel, CategoryModel, CommentModel, UserModel*. These files define methods to interact with the database and perform operations such as retrieval, creation, update, and deletion of entries.
+- **routes**: This folder contains the route configuration files of the application's REST API, such as `activityRoutes.js`, `authRoutes.js`, `bookingRoutes.js`, `categoryRoutes.js`, and `commentRoutes.js`. Each file defines routes for different functionalities of the application, calling appropriate methods from the models.
+    - For example, in the `activityRoutes` file, routes include retrieving all activities, getting online activities, fetching pending approval activities, getting activities created by a specific author, creating, updating, and deleting activities, etc. For some sensitive routes such as creating, updating, and deleting activities, as well as moderating activities by an admin, it uses the `withAuth` and `adminAuth` middlewares to ensure the user is authenticated and has necessary permissions if needed.
+    - Special mention for `authRoutes.js`: this file handles the authentication route in the application, *GET /api/v1/user/checkToken*, allowing an authenticated user to verify their authentication token and retrieve their associated user information from the database. This facilitates automatic reconnection from the frontend and maintains an active user session.
+
+- **public**: It contains static resources, main images, as the CSS, which is minimal, is directly integrated into the views.
+- **views**: It contains views for confirming account creation and password change. They consist of the HTML page structure and associated CSS.
+- Middleware files **withAuth** and **adminAuth** are used to authenticate users and ensure they have necessary permissions to access certain routes.
+
+## Related Repository 🔗
+The frontend part of the application is accessible [here](https://github.com/marionrobert/harmony-front-react)
+
+
