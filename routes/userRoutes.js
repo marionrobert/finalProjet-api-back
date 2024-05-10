@@ -47,6 +47,7 @@ module.exports = (app, db) => {
     if(req.body.email === ""){
         res.json({status: 401, msg: "Entrez un email..."})
     } else {
+      console.log("email -->", req.body.email)
         //on check si il existe un utilisateur dans la bdd avec un mail correspondant
         let user = await userModel.getUserByEmail(req.body.email)
         if(user.code){
@@ -157,14 +158,11 @@ module.exports = (app, db) => {
   app.post('/api/v1/user/changePassword/:key_id', async (req, res, next) => {
     let info = null
     let error = null
-    console.log("hello from userRoutes in api back")
-    console.log("req.body.password1", req.body.password1)
-    console.log("req.body.password1", req.body.password2)
     if(req.body.password1 !== req.body.password2){
         error = "Vos deux mots de passe ne sont pas identiques!"
     } else {
         let result = await userModel.updatepassword(req.body.password1, req.params.key_id)
-        console.log("result updatepassword -->", result)
+        // console.log("result updatepassword -->", result)
         if(result.code){
             error = "Le mot de passe n'a pas pu être modifié. Veuillez réessayer ou contacter le service client."
         } else {
@@ -180,16 +178,21 @@ module.exports = (app, db) => {
     if (user.code){
       res.json({status: 500, msg: "L'utilisateur n'a pas été retrouvé."})
     } else {
-      let result = await userModel.updateUser(req, req.params.key_id)
-      if (result.code){
-        res.json({status: 500, msg: "Les informations de l'utilisateur n'ont pas pu être mises à jour.", err: result})
-      } else {
-        let newUser = await userModel.getOneUserByKeyId(req.params.key_id)
-        if(newUser.code){
-            res.json({status: 500, msg: "Un problème est survenu.", err: newUser})
+      console.log("user -->", user)
+      if (user.length > 0){
+        let result = await userModel.updateUser(req, req.params.key_id)
+        if (result.code){
+          res.json({status: 500, msg: "Les informations de l'utilisateur n'ont pas pu être mises à jour.", err: result})
         } else {
-            res.json({status: 200, msg: "Les informations de l'utilisateur ont bien été mises à jour.", user:newUser[0]})
+          let newUser = await userModel.getOneUserByKeyId(req.params.key_id)
+          if(newUser.code){
+              res.json({status: 500, msg: "Un problème est survenu.", err: newUser})
+          } else {
+              res.json({status: 200, msg: "Les informations de l'utilisateur ont bien été mises à jour.", user:newUser[0]})
+          }
         }
+      } else {
+        res.json({status: 404, msg: "Il n'existe pas d'utilisateur correspondant aux paramètres renseignés."})
       }
     }
   })
@@ -202,21 +205,26 @@ module.exports = (app, db) => {
       res.json({status: 500, msg: "Erreur de modification de l'image de profil.", err: changeAvatar})
     } else {
       let user = await userModel.getOneUserByKeyId(req.params.key_id)
+      console.log("user -->", user)
       if (user.code){
         res.json({status: 500, msg: "Erreur de récupération de l'utilisateur", err: user})
       } else {
-        let myUser = {
-          id: user[0].id,
-          email: user[0].email,
-          firstName: user[0].firstName,
-          lastName: user[0].lastName,
-          role: user[0].role,
-          phone: user[0].phone,
-          avatar: user[0].avatar,
-          key_id: user[0].key_id,
-          points: user[0].points
+        if (user.length > 0) {
+          let myUser = {
+            id: user[0].id,
+            email: user[0].email,
+            firstName: user[0].firstName,
+            lastName: user[0].lastName,
+            role: user[0].role,
+            phone: user[0].phone,
+            avatar: user[0].avatar,
+            key_id: user[0].key_id,
+            points: user[0].points
+          }
+          res.json({status: 200, msg: "Image de profil modifiée.", user: myUser })
+        } else {
+          res.json({status: 404, msg: "Il n'existe pas d'utilisateur correspondant aux paramètres renseignés."})
         }
-        res.json({status: 200, msg: "Image de profil modifiée.", user: myUser })
       }
     }
   })

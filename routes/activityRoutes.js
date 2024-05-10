@@ -251,7 +251,7 @@ module.exports = (app, db) => {
   })
 
   //route de récupération des activités correspond aux filters appliqués par l'utilisateur
-  app.get("/api/v1/activtity/all/filter", withAuth, async(req, res, next)=>{
+  app.post("/api/v1/activtity/all/filter", withAuth, async(req, res, next)=>{
     // récupération des activités selon les filtres demandés
     let activities = await activityModel.getActivitiesByFilter(req)
     if (activities.code){

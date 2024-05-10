@@ -154,11 +154,11 @@ class ActivityModel {
   // filter les activités
   static async getActivitiesByFilter(req){
     let condition = " WHERE status='online'"
-    console.log("req dans getActivitiesByFilter -->", req)
+    console.log("req.body dans getActivitiesByFilter -->", req.body)
     // FORMAT DE LA REQUETE SQl A OBTENIR : SELECT * FROM activities WHERE status = 'online' AND authorIsProvider = true/false AND category_id IN (2, 3, 7, 9) AND points BETWEEN min_points AND max_points AND duration BETWEEN min_duration AND max_duration;
 
     //si l'utilisateur a choisi des catégories -- format d'un array contenant les id des catégories choisies
-    if(req.body.categories){
+    if(req.body.categories.length > 0){
       if (req.body.categories.length === 1) {
         condition += ` AND category_id = ${req.body.categories[0]}`;
       } else {
@@ -172,9 +172,9 @@ class ActivityModel {
     }
 
     // si l'utilisateur a choisi une fourchette pour les points -- req.body.points = {min_points: 1, max_points: 3}
-    if(req.body.points){
-      condition += ` AND points BETWEEN ${req.body.points.min_points} AND ${req.body.points.max_points}`
-    }
+    // if(req.body.points){
+    //   condition += ` AND points BETWEEN ${req.body.points.min_points} AND ${req.body.points.max_points}`
+    // }
 
     // si l'utilisateur a choisi une fourchette pour la durée --> req.body.duration = {min_duration: 3, max_duration: 4}
     if (req.body.duration){
@@ -188,24 +188,23 @@ class ActivityModel {
       let sql = "SELECT id, category_id, author_id, authorIsProvider, title, description, address, zip, city, lat, lng, status, duration, urlPicture, points, creationTimestamps, updatingTimestamps,  st_distance(POINT(?,?), POINT( lat,lng))*100 AS distance FROM activities "+condition+" HAVING distance < ? ORDER BY distance";
       return db.query(sql, [parseFloat(req.body.lat), parseFloat(req.body.lng), distance])
         .then((res)=>{
-          console.log("res de la requête sql getActivitiesByFilter -->", res)
+          // console.log("res de la requête sql getActivitiesByFilter -->", res)
           return res
         })
         .catch((err) => {
-          console.log("err de la requête sql getActivitiesByFilter -->", err)
+          // console.log("err de la requête sql getActivitiesByFilter -->", err)
           return err
         })
     } else {
       // Requête SQL sans la condition de distance
       let sql = "SELECT id, category_id, author_id, authorIsProvider, title, description, address, zip, city, lat, lng, status, duration, urlPicture, points, creationTimestamps, updatingTimestamps FROM activities "+condition;
-      console.log('requête sql -->', sql)
       return db.query(sql)
         .then((res)=>{
-          console.log("res de la requête sql getActivitiesByFilter without distance -->", res)
+          // console.log("res de la requête sql getActivitiesByFilter without distance -->", res)
           return res
         })
         .catch((err) => {
-          console.log("err de la requête sql getActivitiesByFilter without distance -->", err)
+          // console.log("err de la requête sql getActivitiesByFilter without distance -->", err)
           return err
         });
     }

@@ -1,42 +1,56 @@
-require('dotenv').config(); // chargement des variables d'environnement
+// Chargement des variables d'environnement à partir du fichier .env
+require('dotenv').config();
 
-const express = require("express")
-const app = express()
+// Importation du module Express pour la création d'une application Express
+const express = require("express");
+// Création de l'instance de l'application Express
+const app = express();
 
-const mysql = require("promise-mysql")
-const cors = require("cors")
+// Importation du module promise-mysql pour interagir avec MySQL de manière asynchrone
+const mysql = require("promise-mysql");
+// Importation du module cors pour gérer les requêtes CORS (Cross-Origin Resource Sharing)
+const cors = require("cors");
 
-app.use(cors())
+// Activation du middleware CORS pour permettre les requêtes depuis d'autres domaines
+app.use(cors());
 
-const fileUpload = require("express-fileupload")
-
+// Importation du module express-fileupload pour gérer le téléchargement de fichiers
+const fileUpload = require("express-fileupload");
+// Configuration du middleware pour gérer le téléchargement de fichiers et créer les répertoires parents si besoin
 app.use(fileUpload({
   createParentPath: true
-}))
+}));
 
-//parse les url
-app.use(express.urlencoded({extended: false}))
-app.use(express.json())
-app.use(express.static(__dirname+"/public"))
+// Parsing des URL encodées et JSON
+// permet à Express de comprendre les données provenant de formulaires HTML.
+app.use(express.urlencoded({ extended: false }));
+// permet à Express de comprendre les données au format JSON envoyées depuis le front-end.
+app.use(express.json());
 
+// Activation du dossier public pour servir les fichiers statiques (CSS, JavaScript, images, etc.)
+app.use(express.static(__dirname + "/public"));
+
+// Configuration du moteur de templates EJS
 app.set('views', './views');
 app.set('view engine', 'ejs');
 
 let config;
-// vérification l'api est en ligne (sur un server) ou non et on décide quelle bdd on va utiliser.
+// Vérification si l'API est en ligne (sur un serveur) ou non et décision de quelle base de données utiliser
 if (!process.env.HOST){
-  // pas de variable d'environnement au nom de HOST --> développement local
-  config = require("./config-offline")
+  // Pas de variable d'environnement au nom de HOST --> développement local
+  config = require("./config-offline");
 } else {
-  // en ligne
-  config = require("./config")
+  // En ligne
+  config = require("./config");
 }
 
-const host = process.env.HOST || config.db.host
-const database = process.env.DATABASE_DB || config.db.database
-const user = process.env.USER_DB || config.db.user
-const password = process.env.PASSWORD || config.db.password
-//const port = process.env.PORT || config.db.port (pour ceux qui uitilisent mamp (port 8889) par défaut il est sur le port 3306)
+// Définition des variables de connexion à la base de données en utilisant les variables d'environnement ou la configuration locale
+const host = process.env.HOST || config.db.host;
+const database = process.env.DATABASE_DB || config.db.database;
+const user = process.env.USER_DB || config.db.user;
+const password = process.env.PASSWORD || config.db.password;
+//const port = process.env.PORT || config.db.port (pour ceux qui utilisent MAMP (port 8889), par défaut il est sur le port 3306)
+
 
 //importation des routes
 const userRoutes = require("./routes/userRoutes")
