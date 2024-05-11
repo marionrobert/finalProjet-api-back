@@ -47,7 +47,6 @@ module.exports = (app, db) => {
     if(req.body.email === ""){
         res.json({status: 401, msg: "Entrez un email..."})
     } else {
-      console.log("email -->", req.body.email)
         //on check si il existe un utilisateur dans la bdd avec un mail correspondant
         let user = await userModel.getUserByEmail(req.body.email)
         if(user.code){
@@ -258,7 +257,7 @@ module.exports = (app, db) => {
       res.json({status: 500, msg: "Erreur de récupération de l'utilisateur", err: user })
     } else {
       if (user.length === 0){
-        res.json({status: 404, msg: "Il n'existe pas d'utilisateur correspond à l'id renseigné", user: user })
+        res.json({status: 404, msg: "Il n'existe pas d'utilisateur correspond à l'id renseigné" })
       } else {
         let myUser = {
           id: user[0].id,

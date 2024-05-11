@@ -16,9 +16,9 @@ module.exports = (app, db) => {
       // erreur
       res.json({status: 500, msg: "Erreur de récupération de toutes les activités.", err: activities})
     } else {
-      // aucune résultat trouvé --> code 204
+      // aucune résultat trouvé --> code 404
       if (activities.length === 0){
-        res.json({status: 204, msg: "Il n'existe pas encore d'activités.", activities: activities})
+        res.json({status: 404, msg: "Il n'existe pas encore d'activités.", activities: activities})
       } else {
         // retour avec les activités trouvées
         res.json({status: 200, msg: "Les activités ont bien été récupérées.", activities: activities})
@@ -35,9 +35,9 @@ module.exports = (app, db) => {
       // erreur
       res.json({status: 500, msg: "Erreur de récupération des activités en ligne.", err: activities})
     } else {
-      // aucune activité trouvée --> code 204
+      // aucune activité trouvée --> code 404
       if (activities.length === 0){
-        res.json({status: 204, msg: "Il n'existe pas encore d'activité en ligne.", activities: activities})
+        res.json({status: 404, msg: "Il n'existe pas encore d'activité en ligne.", activities: activities})
       } else {
         // retour avec les activités trouvées
         res.json({status: 200, msg: "Les activités en ligne ont bien été récupérées.", activities: activities})
@@ -51,9 +51,9 @@ module.exports = (app, db) => {
     if (activities.code){
       res.json({status: 500, msg: "Erreur de récupération des activités en attente de validation.", err: activities})
     } else {
-      // aucun résultat --> code 204
+      // aucun résultat --> code 404
       if (activities.length === 0){
-        res.json({status: 204, msg: "Il n'existe pas d'activité en attente de validation.", activities: activities})
+        res.json({status: 404, msg: "Il n'existe pas d'activité en attente de validation.", activities: activities})
       } else {
          // retour avec les activités trouvées
         res.json({status: 200, msg: "Les activités en attente de validation ont bien été récupérées.", activities: activities})
@@ -73,9 +73,9 @@ module.exports = (app, db) => {
         // erreur
         res.json({status: 500, msg: "Erreur de récupération des activités de l'auteur.", err: activities})
       } else {
-        // aucun résultat --> code 204
+        // aucun résultat --> code 404
         if (activities.length === 0){
-          res.json({status: 204, msg: "L'auteur n'a pas encore créé d'activité.", activities: activities})
+          res.json({status: 404, msg: "L'auteur n'a pas encore créé d'activité.", activities: activities})
         } else {
           res.json({status: 200, msg: "Les activités de l'auteur ont bien été récupérées.", activities: activities})
         }
@@ -91,9 +91,9 @@ module.exports = (app, db) => {
       // erreur
       res.json({status: 500, msg: `Erreur de récupération des activités selon le critère author_is_provider: ${req.body.authorIsProvider}.`, err: activities})
     } else {
-      // aucune activité trouvée --> code 204
+      // aucune activité trouvée --> code 404
       if (activities.length === 0){
-        res.json({status: 204, msg: `Il n'y a pas d'activité correspond au critère author_is_provider: ${req.body.authorIsProvider}.`, activities: activities})
+        res.json({status: 404, msg: `Il n'y a pas d'activité correspond au critère author_is_provider: ${req.body.authorIsProvider}.`, activities: activities})
       } else {
         // retour avec les activités correspondant à la recherche
         res.json({status: 200, msg: "Les activités ont bien été récupérées.", activities: activities})
@@ -113,9 +113,9 @@ module.exports = (app, db) => {
         // erreur
         res.json({status: 500, msg: "Erreur de récupération d'une activité.", err: activity})
       } else {
-        // pas d'activité trouvée --> code 204
+        // pas d'activité trouvée --> code 404
         if (activity.length === 0){
-          res.json({status: 204, msg: "Aucune activité ne correspond à cet id.", activity: activity})
+          res.json({status: 404, msg: "Aucune activité ne correspond à cet id.", activity: activity})
         } else {
           // retour avec l'activité trouvée
           res.json({status: 200, msg: "L'activité a bien été trouvée.", activity: activity[0]})
@@ -134,27 +134,39 @@ module.exports = (app, db) => {
       res.json({status: 500, msg: "Erreur de création d'une activité.", err: activity})
     } else {
       // succès: activité créée
-      res.json({status: 200, msg: "L'activité a bien été créée.", activity: activity})
+      res.json({status: 200, msg: "L'activité a bien été créée."})
     }
   })
 
   // route de mise à jour d'une activité par l'auteur de l'activité - route protégée
-  app.put("/api/v1/activity/update/:id", withAuth, async(req,res,next)=>{
-    if (isNaN(req.params.id)){
-      // vérification que l'id renseigné est bien un nombre
-      res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
+  app.put("/api/v1/activity/update/:id", withAuth, async(req, res, next) => {
+    if (isNaN(req.params.id)) {
+        res.json({ status: 500, msg: "L'id renseigné n'est pas un nombre." });
     } else {
-      // mise à jour de l'activité
-      let activity = await activityModel.updateOneActivity(req, req.params.id)
-      if (activity.code){
-        // erreur
-        res.json({status: 500, msg: "Erreur de mise à jour de l'activité.", err: activity})
-      } else {
-        // succès : activité mise à jour
-        res.json({status: 200, msg: "L'activité a bien été mise à jour. Son nouveua format doit être validé par l'administration.", activity: activity})
-      }
+        try {
+            // Vérifier si l'activité existe avant de la mettre à jour
+            let existingActivity = await activityModel.getOneActivity(req.params.id);
+            if (existingActivity.code || existingActivity.length === 0) {
+                res.json({ status: 404, msg: "L'activité spécifiée n'existe pas." });
+                return; // Arrêter l'exécution de la route si l'activité n'existe pas
+            }
+
+            // Mise à jour de l'activité
+            let activity = await activityModel.updateOneActivity(req, req.params.id);
+            if (activity.code) {
+                // Erreur lors de la mise à jour
+                res.json({ status: 500, msg: "Erreur de mise à jour de l'activité.", err: activity });
+            } else {
+                // Succès : activité mise à jour
+                res.json({ status: 200, msg: "L'activité a bien été mise à jour. Son nouveau format doit être validé par l'administration." });
+            }
+        } catch (error) {
+            console.error("Erreur lors de la mise à jour de l'activité :", error);
+            res.json({ status: 500, msg: "Erreur lors de la mise à jour de l'activité.", err: error });
+        }
     }
-  })
+  });
+
 
   //route de mise à jour du statut d'une activité par l'author de l'activité - route protégée
   app.put("/api/v1/activity/update/status/:id", withAuth, async(req,res,next)=>{
@@ -186,18 +198,18 @@ module.exports = (app, db) => {
         // erreur
         res.json({status: 500, msg:"Erreur de récupération de l'activité.", err: activity})
       } else {
-        // aucun résultat trouvé --> code 204
+        // aucun résultat trouvé --> code 404
         if (activity.length === 0){
-          res.json({status: 204, msg: "Il n'existe pas d'activité correspond à l'id renseigné. Le processus de modération de l'activité n'a pas pu aboutir."})
+          res.json({status: 404, msg: "Il n'existe pas d'activité correspond à l'id renseigné. Le processus de modération de l'activité n'a pas pu aboutir."})
         } else {
           // récupération de l'auteur de l'activité par son ID
           let user = await userModel.getOneUserById(activity[0].author_id)
           if (user.code){
             res.json({status: 500, msg: "Erreur de récupération de l'auteur du commentaire.Le processus de modération de l'activité n'a pas pu aboutir."})
           } else {
-            // aucunr ésultat trouvé --> code 204
+            // aucunr ésultat trouvé --> code 404
             if (user.length === 0){
-              res.json({status: 204, msg: "L'utilisateur n'a pas été retrouvé. Le processus de modération de l'activité n'a pas pu aboutir."})
+              res.json({status: 404, msg: "L'utilisateur n'a pas été retrouvé. Le processus de modération de l'activité n'a pas pu aboutir."})
             } else {
               // mise à jour du statut de l'activité (invalidé/validé)
               let resultModeration = await activityModel.moderateOneActivity(req, req.params.id)
@@ -257,9 +269,9 @@ module.exports = (app, db) => {
     if (activities.code){
       res.json({status: 500, msg: "Erreur de récupération des activités selon les filtres renseignés.", err: activities})
     } else {
-      // pas de résultat --> code 204
+      // pas de résultat --> code 404
       if (activities.length === 0){
-        res.json({status: 204, msg: "Aucune activité ne correspond aux critères demandés."})
+        res.json({status: 404, msg: "Aucune activité ne correspond aux critères demandés."})
       } else {
         // succès: retour des résultats
         res.json({status: 200, activities: activities})

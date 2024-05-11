@@ -14,9 +14,9 @@ module.exports = (app,db) => {
       // erreur
       res.json({status: 500, msg: "Erreur de récupération des commentaires.", err: comments})
     } else {
-      // aucun résultat trouvé --> code 204
+      // aucun résultat trouvé --> code 404
       if (comments.length === 0){
-        res.json({status: 204, msg:"Il n'y a pas encore de commentaires."})
+        res.json({status: 404, msg:"Il n'y a pas encore de commentaires."})
       } else {
         res.json({status: 200, msg: "Les commentaires ont bien été récupérés.", comments: comments})
       }
@@ -30,9 +30,9 @@ module.exports = (app,db) => {
       // erreur
       res.json({status: 500, msg: "Erreur de récupération des commentaires en attente de validation par l'administration.", err: comments})
     } else {
-      // aucun résultat trouvé --> code 204
+      // aucun résultat trouvé --> code 404
       if (comments.length === 0){
-        res.json({status: 204, msg:"Il n'y a pas de commentaires en attente de validation par l'administration."})
+        res.json({status: 404, msg:"Il n'y a pas de commentaires en attente de validation par l'administration."})
       } else {
         res.json({status: 200, msg: "Les commentaires en attente de validation par l'administrationont bien été récupérés.", comments: comments})
       }
@@ -48,9 +48,9 @@ module.exports = (app,db) => {
       if (comment.code){
         res.json({status: 500, msg: "Erreur de récupération du commentaire.", err: comment})
       } else {
-        // aucun résultat trouvé --> code 204
+        // aucun résultat trouvé --> code 404
         if (comment.length === 0){
-          res.json({status: 204, msg:"Il n'existe pas de commentaire répondant à l'id renseigné."})
+          res.json({status: 404, msg:"Il n'existe pas de commentaire répondant à l'id renseigné."})
         } else {
           res.json({status: 200, msg: "Le commentaire a bien été récupéré.", comment: comment[0]})
         }
@@ -68,9 +68,9 @@ module.exports = (app,db) => {
       if (comment.code){
         res.json({status: 500, msg: "Erreur de récupération du commentaire.", err: comment})
       } else {
-        // aucun résultat trouvé --> code 204
+        // aucun résultat trouvé --> code 404
         if (comment.length === 0){
-          res.json({status: 204, msg:"Il n'existe pas encore de commentaire lié à cette réservation."})
+          res.json({status: 404, msg:"Il n'existe pas encore de commentaire lié à cette réservation."})
         } else {
           res.json({status: 200, msg: "Le commentaire a bien été récupéré.", comment: comment[0]})
         }
@@ -88,9 +88,9 @@ module.exports = (app,db) => {
         // erreur
         res.json({status: 500, msg: "Erreur de récupération des commentaires validés liés à cette activité.", err: comments})
       } else {
-        // aucun résultat trouvé --> code 204
+        // aucun résultat trouvé --> code 404
         if (comments.length === 0){
-          res.json({status: 204, msg:"Il n'existe pas encore de commentaires validés liés à cette activité."})
+          res.json({status: 404, msg:"Il n'existe pas encore de commentaires validés liés à cette activité."})
         } else {
           res.json({status: 200, msg: "Les commentaires validés liés à l'activité ont bien été récupérés.", comments: comments})
         }
@@ -106,9 +106,9 @@ module.exports = (app,db) => {
       // erreur
       res.json({status: 500, msg: "Erreur de récupération des commentaires validés avec un score élevé.", err: comments})
     } else {
-      // aucun résultat trouvé --> code 204
+      // aucun résultat trouvé --> code 404
       if (comments.length === 0){
-        res.json({status: 204, msg:"Il n'y a pas encore de commentaires validés avec un score élevé."})
+        res.json({status: 404, msg:"Il n'y a pas encore de commentaires validés avec un score élevé."})
       } else {
         res.json({status: 200, msg: "Les commentaires validés avec un score élevé ont bien été récupérés.", comments: comments})
       }
@@ -125,9 +125,9 @@ module.exports = (app,db) => {
         // erreur
         res.json({status: 500, msg: "Erreur de récupération des commentaires liés à l'utilisateur.", err: comments})
       } else {
-        // aucun résultat trouvé --> code 204
+        // aucun résultat trouvé --> code 404
         if (comments.length === 0){
-          res.json({status: 204, msg:"Il n'y a pas encore de commentaires liés à l'utilisateur."})
+          res.json({status: 404, msg:"Il n'y a pas encore de commentaires liés à l'utilisateur."})
         } else {
           res.json({status: 200, msg: "Les commentaires liés à l'utilisateur ont bien été récupérés.", comments: comments})
         }
@@ -143,9 +143,9 @@ module.exports = (app,db) => {
       // erreur
       res.json({status: 500, msg:"Erreur de récupération de la réservation.", err: booking})
     } else {
-      // aucun résultat trouvé --> code 204
+      // aucun résultat trouvé --> code 404
       if(booking.length === 0){
-        res.json({status: 204, msg:"Il n'existe pas de réservation correspond à l'id renseigné."})
+        res.json({status: 404, msg:"Il n'existe pas de réservation correspond à l'id renseigné."})
       } else {
         if (booking[0].booking_status !== "finished"){
           res.json({status: 401, msg:"Vous ne pouvez pas laissé un commentaire tant que l'activité n'a pas été réalisée."})
@@ -185,9 +185,9 @@ module.exports = (app,db) => {
         // erreur
         res.json({status: 500, msg: "Erreur de récupération du commentaire. Le processus de modification n'a pas pu aboutir.", err: comment})
       } else {
-        // aucun résultat trouvé --> code 204
+        // aucun résultat trouvé --> code 404
         if (comment.length === 0){
-          res.json({status: 204, msg: "Il n'existe pas de commentaire lié à cet id."})
+          res.json({status: 404, msg: "Il n'existe pas de commentaire lié à cet id."})
         } else {
           if (comment[0].status === "validated"){
             res.json({status: 401, msg:"Le commentaire a déjà été validé par l'administration, vous ne pouvez plus le modifier."})
@@ -231,9 +231,9 @@ module.exports = (app,db) => {
       if (comment.code){
         res.json({status: 500, msg:"Erreur de récupération du commentaire. Le processus de modération n'a pas pu aboutir.", err: comment})
       } else {
-        // aucun résultat trouvé -> code 204
+        // aucun résultat trouvé -> code 404
         if (comment.length === 0){
-          res.json({status: 204, msg: "Il n'existe pas de commentaire répondant à cet id. Le processus de modération n'a pas pu aboutir."})
+          res.json({status: 404, msg: "Il n'existe pas de commentaire répondant à cet id. Le processus de modération n'a pas pu aboutir."})
         } else {
           // modération : changement de statut du commentaire
           let resultModeration = await commentModel.moderateComment(req, req.params.id)
@@ -247,7 +247,7 @@ module.exports = (app,db) => {
               // erreur
               res.json({status: 500, msg: "Erreur de récupération de l'auteur du commentaire"})
             } else {
-              // aucun résultat trouvé --> code 204
+              // aucun résultat trouvé --> code 404
               if (user.length === 0){
                 res.json({status: 401, msg: "L'utilisateur n'a pas été retrouvé. Aucun email n'a pu lui être envoyé."})
               } else {

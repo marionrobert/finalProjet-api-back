@@ -64,7 +64,6 @@ class UserModel {
     return key_id;
   }
 
-
   // route de validation du compte
   static async validateAccount(key_id){
     let sql = "UPDATE users SET accountIsConfirmed = 'yes' WHERE key_id = ?"
