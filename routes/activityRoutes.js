@@ -118,7 +118,7 @@ module.exports = (app, db) => {
           res.json({status: 404, msg: "Aucune activité ne correspond à cet id.", activity: activity})
         } else {
           // retour avec l'activité trouvée
-          res.json({status: 200, msg: "L'activité a bien été trouvée.", activity: activity[0]})
+          res.json({status: 200, msg: "L'activité a bien été trouvée."})
         }
       }
     }
@@ -181,7 +181,7 @@ module.exports = (app, db) => {
         res.json({status: 500, msg: "Erreur de mise à jour du statut de l'activité.", err: activity})
       } else {
         // mise à jour validée
-        res.json({status: 200, msg: "Le statut de l'activité a bien été mise à jour.", activity: activity})
+        res.json({status: 200, msg: "Le statut de l'activité a bien été mise à jour."})
       }
     }
   })
@@ -225,7 +225,7 @@ module.exports = (app, db) => {
                     `Invalidation de votre activité « ${activity[0].title} »`,
                     `L'activité que vous avez créée n'a pas été validée par l'administration pour le motif suivant: « ${req.body.explanation} ».\nVous pouvez modifier votre activité en prenant en compte cette remarque.\n Le service Harmony`
                   )
-                  res.json({status: 200, msg: "L'activité n'a pas été validée.", result: resultModeration})
+                  res.json({status: 200, msg: "L'activité a été invalidée: statut invalidated."})
                 } else {
                    // l'admin valide l'activité, le créateur de l'activité est prévenu par mail
                   mail(
@@ -234,7 +234,7 @@ module.exports = (app, db) => {
                     `Publication de votre activité « ${activity[0].title} »`,
                     `Bonne nouvelle ! L'activité que vous avez créée a été validée et est désormais en ligne.\n Le service Harmony`
                   )
-                  res.json({status: 200, msg: "Le statut de l'activité a bien été mise à jour. L'activité est désormais en ligne.", resultModeration: resultModeration})
+                  res.json({status: 200, msg: "L'activité a bien été validée. L'activité est désormais en ligne."})
                 }
               }
             }
@@ -257,7 +257,7 @@ module.exports = (app, db) => {
         res.json({status: 500, msg: "Erreur de suppression de l'activité.", err: activity})
       } else {
         // succès
-        res.json({status: 200, msg: "L'activité a bien été supprimée.", activity: activity})
+        res.json({status: 200, msg: "L'activité a bien été supprimée."})
       }
     }
   })
@@ -285,15 +285,24 @@ module.exports = (app, db) => {
     if (isNaN(req.params.id)){
       res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
     } else {
-      // changement de la photo de l'activité
-      let updatingResult = await activityModel.updatePicture(req.body.urlPicture, req.params.id)
-      if (updatingResult.code){
+      // retrouver l'activité
+      let activity = await activityModel.getOneActivity(req.params.id)
+      if (activity.code){
         // erreur
-        res.json({status: 500, msg: "Erreur de modification de la photo.", err: updatingResult})
-      } else {
-        // succès
-        res.json({status: 200, msg: "La photo a bien été modifiée. Votre activité est désormais en attente de validation par l'administration."})
-      }
+        res.json({status: 500, msg: "Erreur de récupération de l'activité.", err: updatingResult})
+      } else if (activity.length === 0) {
+        res.json({staytus: 404, msg: "L'activité n'a pas été retrouvée. Vérifiez l'id renseigné."})
+       } else {
+         // changement de la photo de l'activité
+         let updatingResult = await activityModel.updatePicture(req.body.urlPicture, req.params.id)
+         if (updatingResult.code){
+           // erreur
+           res.json({status: 500, msg: "Erreur de modification de la photo.", err: updatingResult})
+         } else {
+           // succès
+           res.json({status: 200, msg: "La photo a bien été modifiée. Votre activité est désormais en attente de validation par l'administration."})
+         }
+       }
     }
   })
 }
