@@ -12,7 +12,7 @@ module.exports = (app, db)=>{
 
   // Middleware to validate ID
   function isValidId(req, res, next) {
-    const id = req.params.id || req.params.author_id;
+    const id = req.params.id || req.params.author_id || req.params.booker_id;
     if (isNaN(id)) {
         return res.status(400).json({ status: 400, msg: "L'id renseigné n'est pas valide." });
     }
@@ -119,7 +119,7 @@ module.exports = (app, db)=>{
     } catch (error) {
         // Gérer les erreurs inattendues
         console.error(`Erreur lors de la validation de la réalisation de la réservation par le ${userType}:`, error);
-        return res.status(500).json({ status: 500, msg: `Erreur lors de la validation de la réalisation de la réservation par le ${userType}.`, err: error.message });
+        return res.json({ status: 500, msg: `Erreur lors de la validation de la réalisation de la réservation par le ${userType}.`, err: error.message });
     }
   }
 
@@ -142,11 +142,8 @@ module.exports = (app, db)=>{
   })
 
   // route de récupération de toutes les réservations effectuées par un utilisateur (booker_id) - route protégée
-  app.get("/api/v1/booking/all/:booker_id", withAuth, async(req, res, next)=>{
-    // contrôle du type de la variable booker_id
-    if (isNaN(req.params.booker_id)){
-      res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
-    } else {
+  app.get("/api/v1/booking/all/:booker_id", withAuth, isValidId, async(req, res, next)=>{
+    try {
       // récupération des réservations correspondant à l'auteur (id de l'auteur)
       let bookings = await bookingModel.getAllBookingsByBookerId(req.params.booker_id)
       if (bookings.code){
@@ -155,34 +152,37 @@ module.exports = (app, db)=>{
       } else {
         // aucun résultat trouvé
         if (bookings.length === 0){
-          res.json({status: 404, msg: "Cet utilisateur n'a pas encore fait de réservations.", bookings: bookings})
+          res.json({status: 404, msg: "Cet utilisateur n'a pas encore fait de réservations."})
         } else {
           res.json({status: 200, msg: "Les réservations de l'utilisateur ont bien été récupérées.", bookings: bookings})
         }
       }
+    } catch (error){
+      console.error("Erreur de récupération de toutes les réservations pour cet utilisateur.", error);
+      return res.json({ status: 500, msg: "Erreur de récupération de toutes les réservations pour cet utilisateur.", err: error.message });
     }
   })
 
   // route de récupération de toutes les réservations concernant les annonces d'un utilisateur - route protégée
-  app.get("/api/v1/booking/all/activities/:author_id", withAuth, async(req,res,next)=>{
-    // contrôle du type de la variable author_id
-    if (isNaN(req.params.author_id)){
-      res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
-    } else {
+  app.get("/api/v1/booking/all/activities/:author_id", withAuth, isValidId, async(req,res,next)=>{
+    try {
       // récupération des réservations effectuées par un seul utilisateur
       let bookings = await bookingModel.getAllBookingsByAuthorId(req.params.author_id)
       if (bookings.code){
         // erreur
-        res.json({status: 500, msg: "Erreur de récupération de toutes les réservations des activités de de l'utilisateur.", err: bookings})
+        res.json({status: 500, msg: "Erreur de récupération de toutes les réservations des activités de l'utilisateur.", err: bookings})
       } else {
         if (bookings.length === 0){
           // aucun résultat trouvé
-          res.json({status: 404, msg: "Aucune réservation n'existe concernant les activités créées par cet utilisateur.", bookings: bookings})
+          res.json({status: 404, msg: "Aucune réservation n'existe concernant les activités créées par cet utilisateur."})
         } else {
           // succès
           res.json({status: 200, msg: "Les réservations concernant les activités de l'utilisateur ont bien été récupérées.", bookings: bookings})
         }
       }
+    } catch(error){
+      console.error("Erreur de récupération de toutes les réservations des activités de l'utilisateur.", error);
+      return res.json({ status: 500, msg: "Erreur de récupération de toutes les réservations des activités de de l'utilisateur.", err: error.message });
     }
   })
 
