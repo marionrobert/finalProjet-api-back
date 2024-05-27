@@ -20,7 +20,7 @@ module.exports = (app, db)=>{
     } else {
       // aucun résultat trouvé
       if (bookings.length === 0){
-        res.json({status: 204, msg: "Il n'existe pas encore de réservations.", bookings: bookings})
+        res.json({status: 404, msg: "Il n'existe pas encore de réservations.", bookings: bookings})
       } else {
         // succès: renvoi des résultats
         res.json({status: 200, msg: "Les réservations ont bien été récupérées.", bookings: bookings})
@@ -42,7 +42,7 @@ module.exports = (app, db)=>{
       } else {
         // aucun résultat trouvé
         if (bookings.length === 0){
-          res.json({status: 204, msg: "Cet utilisateur n'a pas encore fait de réservations.", bookings: bookings})
+          res.json({status: 404, msg: "Cet utilisateur n'a pas encore fait de réservations.", bookings: bookings})
         } else {
           res.json({status: 200, msg: "Les réservations de l'utilisateur ont bien été récupérées.", bookings: bookings})
         }
@@ -64,7 +64,7 @@ module.exports = (app, db)=>{
       } else {
         if (bookings.length === 0){
           // aucun résultat trouvé
-          res.json({status: 204, msg: "Aucune réservation n'existe concernant les activités créées par cet utilisateur.", bookings: bookings})
+          res.json({status: 404, msg: "Aucune réservation n'existe concernant les activités créées par cet utilisateur.", bookings: bookings})
         } else {
           // succès
           res.json({status: 200, msg: "Les réservations concernant les activités de l'utilisateur ont bien été récupérées.", bookings: bookings})
@@ -174,7 +174,7 @@ module.exports = (app, db)=>{
             } else {
               // aucun résultat trouvé
               if (beneficiaryUser.length === 0){
-                res.json({status: 204, msg: "Il n'y a pas de compte utilisateur avec cet id. Le processus d'acceptation de la réservation ne peut pas aboutir."})
+                res.json({status: 404, msg: "Il n'y a pas de compte utilisateur avec cet id. Le processus d'acceptation de la réservation ne peut pas aboutir."})
               } else {
                 // le bnééficiare doit avoir un solde suffisant pour accepter la réservation
                 if (beneficiaryUser[0].points >= booking[0].points ){
@@ -311,7 +311,7 @@ module.exports = (app, db)=>{
       } else {
         // aucun résultat trouvé
         if (booking.length === 0){
-          res.json({status: 204, msg: "Aucune réservation ne correspond à cet id.", booking: booking})
+          res.json({status: 404, msg: "Aucune réservation ne correspond à cet id.", booking: booking})
         } else {
           // si la réservation n'est pas en attente de réalisation
           if (booking[0].booking_status !== "waiting_for_completion" ){
@@ -325,7 +325,7 @@ module.exports = (app, db)=>{
             } else {
               // aucun résultat trouvé
               if (provider.length === 0) {
-                res.json({status: 204, msg: "Il n'existe pas d'utilisateur correspond à l'id renseigné. La validation de la réalisation de la réservation par le fournisseur n'a pas pu aboutir.", err: provider})
+                res.json({status: 404, msg: "Il n'existe pas d'utilisateur correspond à l'id renseigné. La validation de la réalisation de la réservation par le fournisseur n'a pas pu aboutir.", err: provider})
               } else {
                 // le fournisseur est bien récupéré --> on procède à la mise à jour du statut
                 let resultUpdating = await bookingModel.validateAchievementByProvider(req.params.id)
@@ -341,7 +341,7 @@ module.exports = (app, db)=>{
                   } else {
                     // aucun résultat trouvé
                     if (bookingAfterValidation.length === 0) {
-                      res.json({status: 204, msg: "Aucune réservation ne correspond à cet id.", booking: bookingAfterValidation})
+                      res.json({status: 404, msg: "Aucune réservation ne correspond à cet id.", booking: bookingAfterValidation})
                     } else {
                       // si les deux utilisateurs ont validé la réalisation, alors on peut créditer les points au fournisseur de l'activité
                       if (bookingAfterValidation[0].providerValidation && bookingAfterValidation[0].beneficiaryValidation){
@@ -414,7 +414,7 @@ module.exports = (app, db)=>{
             } else {
               // aucun résultat trouvé
               if (provider.length === 0) {
-                res.json({status: 204, msg: "Il n'existe pas d'utilisateur correspond à l'id renseigné.", err: provider})
+                res.json({status: 404, msg: "Il n'existe pas d'utilisateur correspond à l'id renseigné.", err: provider})
               } else {
                 // confirmation de la réalisation de l'activité par le bénéficiaire
                 let resultUpdating = await bookingModel.validateAchievementByBeneficiary(req.params.id)
@@ -430,7 +430,7 @@ module.exports = (app, db)=>{
                   } else {
                     // aucun résultat trouvé
                     if (bookingAfterValidation.length === 0) {
-                      res.json({status: 204, msg: "Aucune réservation ne correspond à cet id.", booking: bookingAfterValidation[0]})
+                      res.json({status: 404, msg: "Aucune réservation ne correspond à cet id.", booking: bookingAfterValidation[0]})
                     } else {
                       // si les deux utilisateurs ont validé la réalisation, alors on peut créditer les points au fournisseur de l'activité
                       if (bookingAfterValidation[0].providerValidation && bookingAfterValidation[0].beneficiaryValidation){
