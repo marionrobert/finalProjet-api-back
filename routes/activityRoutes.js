@@ -159,6 +159,13 @@ module.exports = (app, db) => {
 
   // route de mise à jour du statut (online/offline) d'une activité par l'auteur de l'activité - route protégée
   app.put("/api/v1/activity/update/status/:id", withAuth, isValidId, activityExists, async (req, res, next) => {
+    const activity = req.activity;
+
+    // Vérifier si le statut actuel est "offline" ou "online"
+    if (activity[0].status !== "offline" && activity[0].status !== "online") {
+        return res.status(400).json({ status: 400, msg: "Vous ne pouvez pas modifier le statut de l'activité : elle est en attente d'être modérée par l'administrateur."});
+    }
+
     try {
         const updateResult = await activityModel.updateOnlineOfflineStatus(req, req.params.id);
         if (updateResult.code) {
