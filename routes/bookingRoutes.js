@@ -10,6 +10,31 @@ module.exports = (app, db)=>{
   const bookingModel = require("../models/BookingModel")(db)
   const userModel = require("../models/UserModel")(db)
 
+  // Middleware to validate ID
+  function isValidId(req, res, next) {
+    const id = req.params.id || req.params.author_id;
+    if (isNaN(id)) {
+        return res.status(400).json({ status: 400, msg: "L'id renseigné n'est pas valide." });
+    }
+    next();
+  }
+
+  // Middleware to check if booking exists
+  async function bookingExists(req, res, next) {
+    const bookingId = req.params.id;
+    try {
+        const booking = await bookingModel.getOneBooking(activityId);
+        if (booking.code || booking.length === 0) {
+            return res.status(404).json({ status: 404, msg: "Aucune réservation ne correspond à l'id renseigné." });
+        }
+        req.booking = booking; // Pass the booking to the next middleware
+        next();
+    } catch (error) {
+        console.error("Erreur lors de la vérification de l'existence de la réservation :", error);
+        return res.status(500).json({ status: 500, msg: "Erreur lors de la vérification de l'existence de la réservation.", err: error.message });
+    }
+  }
+
   // route de récupération de toutes les réservations - route admin
   app.get("/api/v1/booking/all", adminAuth, async(req, res, next)=>{
     // réupération des bookings
@@ -74,23 +99,9 @@ module.exports = (app, db)=>{
   })
 
   // route de récupération d'une réservation par son id - route protégée
-  app.get("/api/v1/booking/one/:id", withAuth, async(req, res, next)=>{
-    if (isNaN(req.params.id)){
-      // contrôle du type de la variable id
-      res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
-    } else {
-      let booking = await bookingModel.getOneBooking(req.params.id)
-      if (booking.code){
-        res.json({status: 500, msg: "Erreur de récupération de la réservation.", err: booking})
-      } else {
-        if (booking.length === 0){
-          res.json({status: 401, msg: "Aucune réservation ne correspond à cet id.", booking: booking})
-        } else {
-          res.json({status: 200, msg: "La réservation a bien été récupérée.", booking: booking[0]})
-        }
-      }
-    }
-  })
+  app.get("/api/v1/booking/one/:id", withAuth, isValidId, bookingExists, async(req, res, next)=>{
+    return res.status(200).json({ status: 200, msg: "L'activité a bien été trouvée.", activity: req.activity });
+  });
 
   // route de création d'une réservation - route protégée
   app.post("/api/v1/booking/save", withAuth, async(req,res,next)=>{
@@ -148,7 +159,7 @@ module.exports = (app, db)=>{
   })
 
   // route d'acceptation d'une réservation - route protégée
-  app.put("/api/v1/booking/accept-booking/:id", withAuth, async(req,res,next)=>{
+  app.put("/api/v1/booking/accept-booking/:id", withAuth, isValidId, async(req,res,next)=>{
     // contrôle du type de l'id renseigné
     if (isNaN(req.params.id)){
       res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
@@ -220,7 +231,7 @@ module.exports = (app, db)=>{
   })
 
   // route d'annulation/refus d'une réservation - route protégée
-  app.delete("/api/v1/booking/delete/:id", withAuth, async(req,res,next)=>{
+  app.delete("/api/v1/booking/delete/:id", withAuth, isValidId, async(req,res,next)=>{
     // contrôle du type de l'id renseigné
     if (isNaN(req.params.id)){
       res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
@@ -298,7 +309,7 @@ module.exports = (app, db)=>{
   })
 
   // route de validation de la réalisation de l'activité par le fournisseur - route protégée
-  app.put("/api/v1/booking/validate-achievement/provider/:id", withAuth, async(req,res,next)=>{
+  app.put("/api/v1/booking/validate-achievement/provider/:id", withAuth, isValidId, async(req,res,next)=>{
     // contrôle du type de l'id renseigné
     if (isNaN(req.params.id)){
       res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
@@ -388,7 +399,7 @@ module.exports = (app, db)=>{
   })
 
   // route de validation de la réalisation de l'activité par le bénéficiaire
-  app.put("/api/v1/booking/validate-achievement/beneficiary/:id", withAuth, async(req,res,next)=>{
+  app.put("/api/v1/booking/validate-achievement/beneficiary/:id", withAuth, isValidId, async(req,res,next)=>{
     // contrôle du type de l'ide renseigné
     if (isNaN(req.params.id)){
       res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
