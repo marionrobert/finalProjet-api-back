@@ -139,7 +139,7 @@ module.exports = (app, db)=>{
                   res.json({status: 500, msg: "Erreur de création de la réservation.", err: booking})
                 } else {
                   // succès : la réservation a eu lieu
-                  res.json({status: 200, msg: `La réservation a bien été créée. Votre solde a été débité de ${req.body.points} points.`, booking: booking})
+                  res.json({status: 200, msg: `La réservation a bien été créée. Votre solde a été débité de ${req.body.points} points.`})
                 }
               }
           }
@@ -194,7 +194,7 @@ module.exports = (app, db)=>{
                     res.json({status: 500, msg: "Erreur de changement du statut de la réservation.", err: bookingUpdated})
                   } else {
                     // succès
-                    res.json({status: 200, msg: `La réservation a bien été acceptée. Le solde de points a été débité de ${booking[0].points} points.`, bookingUpdated: bookingUpdated})
+                    res.json({status: 200, msg: `La réservation a bien été acceptée. Le solde de points a été débité de ${booking[0].points} points.`})
                   }
                 }
             } else {
@@ -252,7 +252,7 @@ module.exports = (app, db)=>{
                 `Annulation d'une demande de réservation`,
                 `La demande de réservation pour l'activité « ${booking[0].activity_title} » a été annulée. Vous avez été recrédité de ${booking[0].points} points.\n Le service Harmony`
               )
-              res.json({status: 200, msg: "La réservation a bien été annulée. Les points ont été recrédités.", err: bookingCancellation})
+              res.json({status: 200, msg: "La réservation a bien été annulée. Les points ont été recrédités."})
             }
           }
         } else {
@@ -289,7 +289,7 @@ module.exports = (app, db)=>{
   })
 
   // route de validation de la réalisation de l'activité par le fournisseur - route protégée
-  app.put("/api/v1/booking/validate-achievement/provider/:id", withAuth, isValidId, async(req,res,next)=>{
+  app.put("/api/v1/booking/validate-achievement/provider/:id", withAuth, isValidId, bookingExists, async(req,res,next)=>{
     const booking = req.booking;
 
     // si la réservation n'est pas en attente de réalisation
@@ -348,12 +348,12 @@ module.exports = (app, db)=>{
                       res.json({status: 500, msg: "Erreur de changement du statut de la réservation.", err: updatedStatus, booking: bookingAfterValidation[0]})
                     } else {
                       // succès
-                      res.json({status: 200, msg: "Les points ont bien été crédités au fournisseur. Le statut de la réservation est 'terminée'.", result: updatedStatus, bookingStatus: req.body.status})
+                      res.json({status: 200, msg: "Les points ont bien été crédités au fournisseur. Le statut de la réservation est 'terminée'.", bookingStatus: req.body.status})
                     }
                   }
                 } else {
                   // le fournisseur n'apas encore confirmé la réalisation de la réservation
-                  res.json({status: 200, msg:"La réalisation de la réservation par le fournisseur a bien été enregistrée.", result: resultUpdating, booking: bookingAfterValidation[0]})
+                  res.json({status: 200, msg:"La réalisation de la réservation par le fournisseur a bien été enregistrée.", booking: bookingAfterValidation[0]})
                 }
               }
             }
@@ -364,7 +364,7 @@ module.exports = (app, db)=>{
   })
 
   // route de validation de la réalisation de l'activité par le bénéficiaire
-  app.put("/api/v1/booking/validate-achievement/beneficiary/:id", withAuth, isValidId, async(req,res,next)=>{
+  app.put("/api/v1/booking/validate-achievement/beneficiary/:id", withAuth, isValidId, bookingExists, async(req,res,next)=>{
     const booking = req.booking;
 
     // la réservation n'est pas en attente de réalisation
@@ -423,12 +423,12 @@ module.exports = (app, db)=>{
                             res.json({status: 500, msg: "Erreur de changement du statut de la réservation.", err: updatedStatus, booking: bookingAfterValidation[0]})
                           } else {
                             // succès
-                            res.json({status: 200, msg: "Les points ont bien été crédités au fournisseur. Le statut de la réservation est 'terminée'.", result: updatedStatus, bookingStatus: req.body.status})
+                            res.json({status: 200, msg: "Les points ont bien été crédités au fournisseur. Le statut de la réservation est 'terminée'.", bookingStatus: req.body.status})
                           }
                         }
                       } else {
                         // le fournisseur n'a pas encore confirmé le réalisation de l'activité, le statut de la réservation reste inchangé
-                        res.json({status: 200, msg:"La réalisation de la réservation par le bénéficiaire a bien été enregistrée.", result: resultUpdating, booking: bookingAfterValidation[0]})
+                        res.json({status: 200, msg:"La réalisation de la réservation par le bénéficiaire a bien été enregistrée.", booking: bookingAfterValidation[0]})
                       }
                     }
                   }
