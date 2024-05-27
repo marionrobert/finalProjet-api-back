@@ -141,14 +141,13 @@ module.exports = (app, db) => {
   // route de mise à jour d'une activité par l'auteur de l'activité - route protégée
   app.put("/api/v1/activity/update/:id", withAuth, async(req, res, next) => {
     if (isNaN(req.params.id)) {
-        res.json({ status: 500, msg: "L'id renseigné n'est pas un nombre." });
+      return res.status(400).json({ status: 400, msg: "L'id renseigné n'est pas valide." });
     } else {
         try {
             // Vérifier si l'activité existe avant de la mettre à jour
             let existingActivity = await activityModel.getOneActivity(req.params.id);
             if (existingActivity.code || existingActivity.length === 0) {
-                res.json({ status: 404, msg: "L'activité spécifiée n'existe pas." });
-                return; // Arrêter l'exécution de la route si l'activité n'existe pas
+                return res.json({ status: 404, msg: "L'activité spécifiée n'existe pas." });
             }
 
             // Mise à jour de l'activité
@@ -166,7 +165,6 @@ module.exports = (app, db) => {
         }
     }
   });
-
 
   //route de mise à jour du statut d'une activité par l'author de l'activité - route protégée
   app.put("/api/v1/activity/update/status/:id", withAuth, async(req,res,next)=>{
@@ -245,22 +243,36 @@ module.exports = (app, db) => {
   })
 
   // route de suppression d'une activité
-  app.delete("/api/v1/activity/delete/:id", withAuth, async(req, res, next)=>{
-    // vérification que l'id renseigné est bien un nombre
-    if (isNaN(req.params.id)){
-      res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
-    } else {
-      // suppression de l'activité
-      let activity = await activityModel.deleteOneActivity(req.params.id)
-      if (activity.code){
-        // erreur
-        res.json({status: 500, msg: "Erreur de suppression de l'activité.", err: activity})
-      } else {
-        // succès
-        res.json({status: 200, msg: "L'activité a bien été supprimée."})
-      }
+  app.delete("/api/v1/activity/delete/:id", withAuth, async (req, res, next) => {
+    const activityId = req.params.id;
+
+    if (isNaN(activityId)) {
+        return res.status(400).json({ status: 400, msg: "L'id renseigné n'est pas valide." });
     }
-  })
+
+    try {
+        // Retrouver l'activité
+        const activity = await activityModel.getOneActivity(activityId);
+        if (activity.code) {
+            return res.status(500).json({ status: 500, msg: "Erreur de récupération de l'activité.", err: activity });
+        } else if (activity.length === 0) {
+            return res.status(404).json({ status: 404, msg: "L'activité n'a pas été retrouvée. Vérifiez l'id renseigné." });
+        }
+
+        // Suppression de l'activité
+        const deleteResult = await activityModel.deleteOneActivity(activityId);
+        if (deleteResult.code) {
+            return res.status(500).json({ status: 500, msg: "Erreur de suppression de l'activité.", err: deleteResult });
+        }
+
+        return res.status(200).json({ status: 200, msg: "L'activité a bien été supprimée." });
+
+    } catch (error) {
+        console.error("Erreur lors de la suppression de l'activité :", error);
+        return res.status(500).json({ status: 500, msg: "Erreur lors de la suppression de l'activité.", err: error.message });
+    }
+  });
+
 
   //route de récupération des activités correspond aux filters appliqués par l'utilisateur
   app.post("/api/v1/activtity/all/filter", withAuth, async(req, res, next)=>{
@@ -280,29 +292,34 @@ module.exports = (app, db) => {
   })
 
   // route de modification de la photo de l'activité
-  app.put("/api/v1/activity/update-picture/:id", withAuth, async(req,res,next)=>{
-    // vérification que l'id renseigné est bien un nombre
-    if (isNaN(req.params.id)){
-      res.json({status: 500, msg: "L'id renseigné n'est pas un nombre."})
-    } else {
-      // retrouver l'activité
-      let activity = await activityModel.getOneActivity(req.params.id)
-      if (activity.code){
-        // erreur
-        res.json({status: 500, msg: "Erreur de récupération de l'activité.", err: updatingResult})
-      } else if (activity.length === 0) {
-        res.json({staytus: 404, msg: "L'activité n'a pas été retrouvée. Vérifiez l'id renseigné."})
-       } else {
-         // changement de la photo de l'activité
-         let updatingResult = await activityModel.updatePicture(req.body.urlPicture, req.params.id)
-         if (updatingResult.code){
-           // erreur
-           res.json({status: 500, msg: "Erreur de modification de la photo.", err: updatingResult})
-         } else {
-           // succès
-           res.json({status: 200, msg: "La photo a bien été modifiée. Votre activité est désormais en attente de validation par l'administration."})
-         }
-       }
+  app.put("/api/v1/activity/update-picture/:id", withAuth, async (req, res, next) => {
+    const activityId = req.params.id;
+
+    if (isNaN(activityId)) {
+        return res.status(400).json({ status: 400, msg: "L'id renseigné n'est pas valide." });
     }
-  })
+
+    try {
+        // Retrouver l'activité
+        const activity = await activityModel.getOneActivity(activityId);
+        if (activity.code) {
+            return res.status(500).json({ status: 500, msg: "Erreur de récupération de l'activité.", err: activity });
+        } else if (activity.length === 0) {
+            return res.status(404).json({ status: 404, msg: "L'activité n'a pas été retrouvée. Vérifiez l'id renseigné." });
+        }
+
+        // Changement de la photo de l'activité
+        const updatingResult = await activityModel.updatePicture(req.body.urlPicture, activityId);
+        if (updatingResult.code) {
+            return res.status(500).json({ status: 500, msg: "Erreur de modification de la photo.", err: updatingResult });
+        }
+
+        return res.status(200).json({ status: 200, msg: "La photo a bien été modifiée. Votre activité est désormais en attente de validation par l'administration." });
+
+    } catch (error) {
+        console.error("Erreur lors de la modification de la photo :", error);
+        return res.status(500).json({ status: 500, msg: "Erreur lors de la modification de la photo.", err: error.message });
+    }
+  });
+
 }
