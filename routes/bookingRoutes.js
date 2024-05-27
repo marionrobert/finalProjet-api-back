@@ -37,6 +37,92 @@ module.exports = (app, db)=>{
     }
   }
 
+  // Fonction générique pour valider la réalisation de l'activité
+  async function validateAchievement(req, res, next, userType) {
+    const booking = req.booking;
+
+    // Vérifier si la réservation est en attente de réalisation
+    if (booking[0].booking_status !== "waiting_for_completion") {
+        return res.json({ status: 401, msg: "Cette action ne peut pas être réalisée: la réservation est toujours en attente d'acceptation ou est terminée." });
+    }
+
+    try {
+        // Récupération du fournisseur de l'activité
+        const provider = await userModel.getOneUserById(booking[0].provider_id);
+        if (provider.code) {
+            return res.json({ status: 500, msg: `Erreur de récupération des informations du ${userType}. La validation de la réalisation de la réservation par le ${userType} n'a pas pu aboutir.`, err: provider });
+        }
+
+        // Vérifier si le fournisseur existe
+        if (provider.length === 0) {
+            return res.json({ status: 404, msg: `Il n'existe pas d'utilisateur correspond à l'id renseigné. La validation de la réalisation de la réservation par le ${userType} n'a pas pu aboutir.`, err: provider });
+        }
+
+        // Validation de la réalisation par le fournisseur ou le bénéficiaire
+        let resultUpdating;
+        if (userType === "provider") {
+            resultUpdating = await bookingModel.validateAchievementByProvider(req.params.id);
+        } else if (userType === "beneficiary") {
+            resultUpdating = await bookingModel.validateAchievementByBeneficiary(req.params.id);
+        }
+
+        if (resultUpdating.code) {
+            return res.json({ status: 500, msg: `Erreur dans la validation de la réalisation de la réservation par le ${userType}.`, err: resultUpdating });
+        }
+
+        // Récupération de la réservation après validation
+        const bookingAfterValidation = await bookingModel.getOneBooking(req.params.id);
+        if (bookingAfterValidation.code) {
+            return res.json({ status: 500, msg: "Erreur de récupération de la réservation après la validation.", err: bookingAfterValidation });
+        }
+
+        // Vérifier si la réservation a été trouvée
+        if (bookingAfterValidation.length === 0) {
+            return res.json({ status: 404, msg: "Aucune réservation ne correspond à cet id.", booking: bookingAfterValidation });
+        }
+
+        // Vérifier si les deux utilisateurs ont validé la réalisation
+        if (bookingAfterValidation[0].providerValidation && bookingAfterValidation[0].beneficiaryValidation) {
+            // Créditer les points au fournisseur de l'activité
+            const changePoints = userModel.increasePoints(bookingAfterValidation[0].points, bookingAfterValidation[0].provider_id);
+            if (changePoints.code) {
+                // Gérer l'erreur de crédit des points
+                mail(
+                    provider[0].email,
+                    `Erreur : votre compte n'a pas pu être crédité.`,
+                    `Erreur : votre compte n'a pas pu être crédité après la réalisation de l'activité.`,
+                    `L'activité « ${bookingAfterValidation[0].activity_title} » a bien été réalisée (réservation n°${bookingAfterValidation[0].booking_id}) mais votre compte n'a pas pu être crédité de ${bookingAfterValidation[0].points} points. Veuillez contacter l'administration.\n Le service Harmony`
+                );
+                return res.json({ status: 500, msg: "Une erreur est survenue dans le versement des points mais la validation de la réalisation de la réservation a bien eu lieu.", err: changePoints });
+            } else {
+                // Envoyer un e-mail au fournisseur
+                mail(
+                    provider[0].email,
+                    `Activité réalisée : réception des points.`,
+                    `Activité réalisée : réception des points.`,
+                    `L'activité « ${bookingAfterValidation[0].activity_title} » a bien été réalisée (réservation n°${bookingAfterValidation[0].booking_id}) : votre compte a été crédité de ${bookingAfterValidation[0].points} points.\n Le service Harmony`
+                );
+                // Mettre à jour le statut de la réservation
+                const updatedStatus = await bookingModel.updateStatus(req, req.params.id);
+                if (updatedStatus.code) {
+                    // Gérer l'erreur de mise à jour du statut
+                    return res.json({ status: 500, msg: "Erreur de changement du statut de la réservation.", err: updatedStatus, booking: bookingAfterValidation[0] });
+                } else {
+                    // Renvoyer la réponse appropriée
+                    return res.json({ status: 200, msg: "Les points ont bien été crédités au fournisseur. Le statut de la réservation est 'terminée'.", bookingStatus: req.body.status });
+                }
+            }
+        } else {
+            // Renvoyer la réponse appropriée si la réalisation n'est pas confirmée par les deux utilisateurs
+            return res.json({ status: 200, msg: `La réalisation de la réservation par le ${userType === "beneficiary" ? "bénéficiaire" : "fournisseur"} a bien été enregistrée.` });
+        }
+    } catch (error) {
+        // Gérer les erreurs inattendues
+        console.error(`Erreur lors de la validation de la réalisation de la réservation par le ${userType}:`, error);
+        return res.status(500).json({ status: 500, msg: `Erreur lors de la validation de la réalisation de la réservation par le ${userType}.`, err: error.message });
+    }
+  }
+
   // route de récupération de toutes les réservations - route admin
   app.get("/api/v1/booking/all", adminAuth, async(req, res, next)=>{
     // réupération des bookings
@@ -211,7 +297,7 @@ module.exports = (app, db)=>{
           res.json({status: 500, msg: "Erreur de changement du statut de la réservation.", err: bookingUpdated})
         } else {
           // succès
-          res.json({status: 200, msg: `La réservation a bien été acceptée.`, bookingUpdated: bookingUpdated})
+          res.json({status: 200, msg: `La réservation a bien été acceptée.`})
         }
       }
     } else {
@@ -288,153 +374,13 @@ module.exports = (app, db)=>{
     }
   })
 
-  // route de validation de la réalisation de l'activité par le fournisseur - route protégée
-  app.put("/api/v1/booking/validate-achievement/provider/:id", withAuth, isValidId, bookingExists, async(req,res,next)=>{
-    const booking = req.booking;
-
-    // si la réservation n'est pas en attente de réalisation
-    if (booking[0].booking_status !== "waiting_for_completion" ){
-      res.json({status: 401, msg: "Cette action ne peut pas être réalisée: la réservation est toujours en attente d'acceptation ou est terminée."})
-    } else { // la réservation est en attente de réalisation
-      //  récupération du fournisseur de l'activité
-      let provider = await userModel.getOneUserById(booking[0].provider_id)
-      if (provider.code){
-        // erreur
-        res.json({status: 500, msg: "Erreur de récupération des informations du fournisseur. La validation de la réalisation de la réservation par le fournisseur n'a pas pu aboutir.", err: provider})
-      } else {
-        // aucun résultat trouvé
-        if (provider.length === 0) {
-          res.json({status: 404, msg: "Il n'existe pas d'utilisateur correspond à l'id renseigné. La validation de la réalisation de la réservation par le fournisseur n'a pas pu aboutir.", err: provider})
-        } else {
-          // le fournisseur est bien récupéré --> on procède à la mise à jour du statut
-          let resultUpdating = await bookingModel.validateAchievementByProvider(req.params.id)
-          if (resultUpdating.code){
-            // erreur
-            res.json({status: 500, msg: "Erreur dans la validation de la réalisation de la réservation par le fournisseur. Le processus n'a pas pu aboutir.", err: resultUpdating})
-          } else {
-            // récupération du booking après le changement
-            let bookingAfterValidation = await bookingModel.getOneBooking(req.params.id)
-            if (bookingAfterValidation.code){
-              // erreur
-              res.json({status: 500, msg: "Erreur de récupération de la réservation après la validation.", err: bookingAfterValidation})
-            } else {
-              // aucun résultat trouvé
-              if (bookingAfterValidation.length === 0) {
-                res.json({status: 404, msg: "Aucune réservation ne correspond à cet id.", booking: bookingAfterValidation})
-              } else {
-                // si les deux utilisateurs ont validé la réalisation, alors on peut créditer les points au fournisseur de l'activité
-                if (bookingAfterValidation[0].providerValidation && bookingAfterValidation[0].beneficiaryValidation){
-                  let changePoints = userModel.increasePoints(bookingAfterValidation[0].points, bookingAfterValidation[0].provider_id)
-                  if (changePoints.code){
-                    // erreur
-                    mail(
-                      provider[0].email,
-                      `Erreur : votre compte n'a pas pu être crédité.`,
-                      `Erreur : votre compte n'a pas pu être crédité après la réalisation de l'activité.`,
-                      `L'activité « ${bookingAfterValidation[0].activity_title} » a bien été réalisée (réservation n°${bookingAfterValidation[0].booking_id}) mais votre compte n'a pas pu être crédité de ${bookingAfterValidation[0].points} points. Veuillez contacter l'administration.\n Le service Harmony`
-                    )
-                    res.json({status:500, msg:"Une erreur est survenue dans le versement des points mais la validation de la réalisation de la réservation a bien eu lieu.", err:changePoints})
-                  } else {
-                    mail(
-                      provider[0].email,
-                      `Activité réalisée : réception des points.`,
-                      `Activité réalisée : réception des points.`,
-                      `L'activité « ${bookingAfterValidation[0].activity_title} » a bien été réalisée (réservation n°${bookingAfterValidation[0].booking_id}) : votre compte a été crédité de ${bookingAfterValidation[0].points} points.\n Le service Harmony`
-                    )
-                    // les point ont bien été crédités au fournisseur de l'activité, le statut de la réservation peut être changé
-                    let updatedStatus = await bookingModel.updateStatus(req, req.params.id)
-                    if (updatedStatus.code){
-                      // erreur
-                      res.json({status: 500, msg: "Erreur de changement du statut de la réservation.", err: updatedStatus, booking: bookingAfterValidation[0]})
-                    } else {
-                      // succès
-                      res.json({status: 200, msg: "Les points ont bien été crédités au fournisseur. Le statut de la réservation est 'terminée'.", bookingStatus: req.body.status})
-                    }
-                  }
-                } else {
-                  // le fournisseur n'apas encore confirmé la réalisation de la réservation
-                  res.json({status: 200, msg:"La réalisation de la réservation par le fournisseur a bien été enregistrée.", booking: bookingAfterValidation[0]})
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  })
+  // route de validation de la réalisation de l'activité par le fournisseur
+  app.put("/api/v1/booking/validate-achievement/provider/:id", withAuth, isValidId, bookingExists, async (req, res, next) => {
+    await validateAchievement(req, res, next, "provider");
+  });
 
   // route de validation de la réalisation de l'activité par le bénéficiaire
-  app.put("/api/v1/booking/validate-achievement/beneficiary/:id", withAuth, isValidId, bookingExists, async(req,res,next)=>{
-    const booking = req.booking;
-
-    // la réservation n'est pas en attente de réalisation
-    if (booking[0].booking_status !== "waiting_for_completion"){
-      res.json({status: 401, msg: "Cette action ne peut pas être réalisée: la réservation est toujours en attente d'acceptation ou est terminée."})
-    } else { // la réservation est en attente de réalisation
-            //  récupération du fournisseur de l'activité
-            let provider = await userModel.getOneUserById(booking[0].provider_id)
-            if (provider.code){
-              res.json({status: 500, msg: "Erreur de récupération des informations du fournisseur. La validation de la réalisation de la réservation par le bénéficiaire n'a pas pu aboutir.", err: provider})
-            } else {
-              // aucun résultat trouvé
-              if (provider.length === 0) {
-                res.json({status: 404, msg: "Il n'existe pas d'utilisateur correspond à l'id renseigné.", err: provider})
-              } else {
-                // confirmation de la réalisation de l'activité par le bénéficiaire
-                let resultUpdating = await bookingModel.validateAchievementByBeneficiary(req.params.id)
-                if (resultUpdating.code){
-                  // erreur
-                  res.json({status: 500, msg: "Erreur dans la validation de la réalisation de la réservation par le bénéficiaire.", err: resultUpdating})
-                } else {
-                  // récupération de la réservation après confirmation
-                  let bookingAfterValidation = await bookingModel.getOneBooking(req.params.id)
-                  if (bookingAfterValidation.code){
-                    // erreur
-                    res.json({status: 500, msg: "Erreur de récupération de la réservation après la validation.", err: bookingAfterValidation})
-                  } else {
-                    // aucun résultat trouvé
-                    if (bookingAfterValidation.length === 0) {
-                      res.json({status: 404, msg: "Aucune réservation ne correspond à cet id.", booking: bookingAfterValidation[0]})
-                    } else {
-                      // si les deux utilisateurs ont validé la réalisation, alors on peut créditer les points au fournisseur de l'activité
-                      if (bookingAfterValidation[0].providerValidation && bookingAfterValidation[0].beneficiaryValidation){
-                        let changePoints = userModel.increasePoints(bookingAfterValidation[0].points, bookingAfterValidation[0].provider_id)
-                        if (changePoints.code){
-                          // les points n'ont pas été crédités au fournisseur, email pour le prévenir
-                          mail(
-                            provider[0].email,
-                            `Erreur : votre compte n'a pas pu être crédit.`,
-                            `Erreur : votre compte n'a pas pu être crédit.`,
-                            `L'activité ${bookingAfterValidation[0].activity_title} a bien été réalisée (réservation n°${bookingAfterValidation[0].booking_id}) mais votre compte n'a pas pu être crédité de ${bookingAfterValidation[0].points} points. Veuillez contacter l'administration.\n Le service Harmony`
-                          )
-                          res.json({status:500, msg:"Une erreur est survenue dans le versement des points mais la validation de la réalisation de la réservation a bien eu lieu.", err:changePoints})
-                        } else {
-                          // les points ont bine été crédités au fournisseur, email pour le prévenir
-                          mail(
-                            provider[0].email,
-                            `Activité réalisée : réception des points.`,
-                            `Activité réalisée : réception des points.`,
-                            `L'activité ${bookingAfterValidation[0].activity_title} a bien été réalisée (réservation n°${bookingAfterValidation[0].booking_id}) : votre compte a été crédité de ${bookingAfterValidation[0].points} points.\n Le service Harmony`
-                          )
-                          // les point ont été crédités, le statut de la réservation peut-être passé en "terminée"
-                          let updatedStatus = await bookingModel.updateStatus(req, req.params.id)
-                          if (updatedStatus.code){
-                            // erreur
-                            res.json({status: 500, msg: "Erreur de changement du statut de la réservation.", err: updatedStatus, booking: bookingAfterValidation[0]})
-                          } else {
-                            // succès
-                            res.json({status: 200, msg: "Les points ont bien été crédités au fournisseur. Le statut de la réservation est 'terminée'.", bookingStatus: req.body.status})
-                          }
-                        }
-                      } else {
-                        // le fournisseur n'a pas encore confirmé le réalisation de l'activité, le statut de la réservation reste inchangé
-                        res.json({status: 200, msg:"La réalisation de la réservation par le bénéficiaire a bien été enregistrée.", booking: bookingAfterValidation[0]})
-                      }
-                    }
-                  }
-                }
-              }
-            }
-    }
-  })
+  app.put("/api/v1/booking/validate-achievement/beneficiary/:id", withAuth, isValidId, bookingExists, async (req, res, next) => {
+    await validateAchievement(req, res, next, "beneficiary");
+  });
 }
