@@ -8,6 +8,31 @@ module.exports = (app, db) => {
   const activityModel = require("../models/ActivityModel")(db)
   const userModel = require ("../models/UserModel")(db)
 
+  // Middleware to validate ID
+  function isValidId(req, res, next) {
+    const id = req.params.id || req.params.author_id;
+    if (isNaN(id)) {
+        return res.status(400).json({ status: 400, msg: "L'id renseigné n'est pas valide." });
+    }
+    next();
+  }
+
+  // Middleware to check if activity exists
+  async function activityExists(req, res, next) {
+    const activityId = req.params.id;
+    try {
+        const activity = await activityModel.getOneActivity(activityId);
+        if (activity.code || activity.length === 0) {
+            return res.status(404).json({ status: 404, msg: "Aucune activité ne correspond à l'id renseigné." });
+        }
+        req.activity = activity; // Pass the activity to the next middleware
+        next();
+    } catch (error) {
+        console.error("Erreur lors de la vérification de l'existence de l'activité :", error);
+        return res.status(500).json({ status: 500, msg: "Erreur lors de la vérification de l'existence de l'activité.", err: error.message });
+    }
+  }
+
   //route de récupération de toutes les activités
   app.get("/api/v1/activity/all", async(req,res,next)=>{
     // récupération de toutes les activités
@@ -62,12 +87,8 @@ module.exports = (app, db) => {
   })
 
   //route de récupération de toutes les activités créées par un même auteur - route protégée
-  app.get("/api/v1/activity/all/author/:author_id", withAuth, async (req, res, next) => {
+  app.get("/api/v1/activity/all/author/:author_id", withAuth, isValidId, async (req, res, next) => {
     const authorId = req.params.author_id;
-
-    if (isNaN(authorId)) {
-        return res.status(400).json({ status: 400, msg: "L'id renseigné n'est pas valide." });
-    }
 
     try {
         // Récupération de toutes les activités créées par un même auteur
@@ -104,32 +125,12 @@ module.exports = (app, db) => {
   })
 
   //route de récupération d'une activité - route protégée
-  app.get("/api/v1/activity/:id", withAuth, async (req, res, next) => {
-    const activityId = req.params.id;
-
-    if (isNaN(activityId)) {
-        return res.status(400).json({ status: 400, msg: "L'id renseigné n'est pas valide." });
-    }
-
-    try {
-        // Récupération de l'activité par son ID
-        const activity = await activityModel.getOneActivity(activityId);
-        if (activity.code) {
-            return res.status(500).json({ status: 500, msg: "Erreur de récupération d'une activité.", err: activity });
-        } else if (activity.length === 0) {
-            return res.status(404).json({ status: 404, msg: "Aucune activité ne correspond à cet id."});
-        } else {
-            return res.status(200).json({ status: 200, msg: "L'activité a bien été trouvée.", activity: activity });
-        }
-    } catch (error) {
-        console.error("Erreur lors de la récupération d'une activité :", error);
-        return res.status(500).json({ status: 500, msg: "Erreur lors de la récupération d'une activité.", err: error.message });
-    }
+  app.get("/api/v1/activity/:id", withAuth, isValidId, activityExists, (req, res, next) => {
+    return res.status(200).json({ status: 200, msg: "L'activité a bien été trouvée.", activity: req.activity });
   });
 
   //routes de création d'une activité - route protégée
   app.post("/api/v1/activity/save", withAuth, async(req, res, next)=>{
-    // console.log("hello from in /api/v1/activity/save route")
     // enregistrement de la nouvelle activité
     let activity = await activityModel.saveOneActivity(req)
     if (activity.code){
@@ -137,59 +138,32 @@ module.exports = (app, db) => {
       res.json({status: 500, msg: "Erreur de création d'une activité.", err: activity})
     } else {
       // succès: activité créée
-      res.json({status: 200, msg: "L'activité a bien été créée."})
+      res.json({status: 200, msg: "L'activité a bien été créée.", activity: activity})
     }
   })
 
   // route de mise à jour d'une activité par l'auteur de l'activité - route protégée
-  app.put("/api/v1/activity/update/:id", withAuth, async(req, res, next) => {
-    if (isNaN(req.params.id)) {
-      return res.status(400).json({ status: 400, msg: "L'id renseigné n'est pas valide." });
-    } else {
-        try {
-            // Vérifier si l'activité existe avant de la mettre à jour
-            let existingActivity = await activityModel.getOneActivity(req.params.id);
-            if (existingActivity.code || existingActivity.length === 0) {
-                return res.json({ status: 404, msg: "L'activité spécifiée n'existe pas." });
-            }
-
-            // Mise à jour de l'activité
-            let activity = await activityModel.updateOneActivity(req, req.params.id);
-            if (activity.code) {
-                // Erreur lors de la mise à jour
-                res.json({ status: 500, msg: "Erreur de mise à jour de l'activité.", err: activity });
-            } else {
-                // Succès : activité mise à jour
-                res.json({ status: 200, msg: "L'activité a bien été mise à jour. Son nouveau format doit être validé par l'administration." });
-            }
-        } catch (error) {
-            console.error("Erreur lors de la mise à jour de l'activité :", error);
-            res.json({ status: 500, msg: "Erreur lors de la mise à jour de l'activité.", err: error });
+  app.put("/api/v1/activity/update/:id", withAuth, isValidId, activityExists, async (req, res, next) => {
+    try {
+        const activity = await activityModel.updateOneActivity(req, req.params.id);
+        if (activity.code) {
+            res.json({ status: 500, msg: "Erreur de mise à jour de l'activité.", err: activity });
+        } else {
+            res.json({ status: 200, msg: "L'activité a bien été mise à jour. Son nouveau format doit être validé par l'administration." });
         }
+    } catch (error) {
+        console.error("Erreur lors de la mise à jour de l'activité :", error);
+        res.json({ status: 500, msg: "Erreur lors de la mise à jour de l'activité.", err: error });
     }
   });
 
-  // route de mise à jour du statut d'une activité par l'auteur de l'activité - route protégée
-  app.put("/api/v1/activity/update/status/:id", withAuth, async (req, res, next) => {
-    const activityId = req.params.id;
-
-    if (isNaN(activityId)) {
-        return res.status(400).json({ status: 400, msg: "L'id renseigné n'est pas valide." });
-    }
-
+  // route de mise à jour du statut (online/offline) d'une activité par l'auteur de l'activité - route protégée
+  app.put("/api/v1/activity/update/status/:id", withAuth, isValidId, activityExists, async (req, res, next) => {
     try {
-        // Vérifier si l'activité existe avant de mettre à jour le statut
-        const existingActivity = await activityModel.getOneActivity(activityId);
-        if (existingActivity.code || existingActivity.length === 0) {
-            return res.status(404).json({ status: 404, msg: "Aucune activité ne correspond à l'id renseigné." });
-        }
-
-        // Mise à jour du statut de l'activité (en ligne/hors ligne)
-        const updateResult = await activityModel.updateOnlineOfflineStatus(req, activityId);
+        const updateResult = await activityModel.updateOnlineOfflineStatus(req, req.params.id);
         if (updateResult.code) {
             return res.status(500).json({ status: 500, msg: "Erreur de mise à jour du statut de l'activité.", err: updateResult });
         }
-
         return res.status(200).json({ status: 200, msg: "Le statut de l'activité a bien été mis à jour." });
     } catch (error) {
         console.error("Erreur lors de la mise à jour du statut de l'activité :", error);
@@ -198,22 +172,11 @@ module.exports = (app, db) => {
   });
 
   //route de modération de l'activité par l'admin : mise à jour du statut (en attente de validation --> validé/en ligne) - route admin
-  app.put("/api/v1/activity/moderate/:id", adminAuth, async (req, res, next) => {
+  app.put("/api/v1/activity/moderate/:id", adminAuth, isValidId, activityExists, async (req, res) => {
     const activityId = req.params.id;
-
-    if (isNaN(activityId)) {
-        return res.status(400).json({ status: 400, msg: "L'id renseigné n'est pas valide." });
-    }
+    const activity = req.activity;
 
     try {
-        // Récupération de l'activité par son ID
-        const activity = await activityModel.getOneActivity(activityId);
-        if (activity.code) {
-            return res.status(500).json({ status: 500, msg: "Erreur de récupération de l'activité.", err: activity });
-        } else if (activity.length === 0) {
-            return res.status(404).json({ status: 404, msg: "Il n'existe pas d'activité correspondant à l'id renseigné. Le processus de modération de l'activité n'a pas pu aboutir." });
-        }
-
         // Récupération de l'auteur de l'activité par son ID
         const user = await userModel.getOneUserById(activity[0].author_id);
         if (user.code) {
@@ -255,30 +218,13 @@ module.exports = (app, db) => {
   });
 
   // route de suppression d'une activité
-  app.delete("/api/v1/activity/delete/:id", withAuth, async (req, res, next) => {
-    const activityId = req.params.id;
-
-    if (isNaN(activityId)) {
-        return res.status(400).json({ status: 400, msg: "L'id renseigné n'est pas valide." });
-    }
-
+  app.delete("/api/v1/activity/delete/:id", withAuth, isValidId, activityExists, async (req, res, next) => {
     try {
-        // Retrouver l'activité
-        const activity = await activityModel.getOneActivity(activityId);
-        if (activity.code) {
-            return res.status(500).json({ status: 500, msg: "Erreur de récupération de l'activité.", err: activity });
-        } else if (activity.length === 0) {
-            return res.status(404).json({ status: 404, msg: "L'activité n'a pas été retrouvée. Vérifiez l'id renseigné." });
-        }
-
-        // Suppression de l'activité
-        const deleteResult = await activityModel.deleteOneActivity(activityId);
+        const deleteResult = await activityModel.deleteOneActivity(req.params.id);
         if (deleteResult.code) {
             return res.status(500).json({ status: 500, msg: "Erreur de suppression de l'activité.", err: deleteResult });
         }
-
         return res.status(200).json({ status: 200, msg: "L'activité a bien été supprimée." });
-
     } catch (error) {
         console.error("Erreur lors de la suppression de l'activité :", error);
         return res.status(500).json({ status: 500, msg: "Erreur lors de la suppression de l'activité.", err: error.message });
@@ -303,34 +249,19 @@ module.exports = (app, db) => {
   })
 
   // route de modification de la photo de l'activité
-  app.put("/api/v1/activity/update-picture/:id", withAuth, async (req, res, next) => {
+  app.put("/api/v1/activity/update-picture/:id", withAuth, isValidId, activityExists, async (req, res) => {
     const activityId = req.params.id;
 
-    if (isNaN(activityId)) {
-        return res.status(400).json({ status: 400, msg: "L'id renseigné n'est pas valide." });
-    }
-
     try {
-        // Retrouver l'activité
-        const activity = await activityModel.getOneActivity(activityId);
-        if (activity.code) {
-            return res.status(500).json({ status: 500, msg: "Erreur de récupération de l'activité.", err: activity });
-        } else if (activity.length === 0) {
-            return res.status(404).json({ status: 404, msg: "L'activité n'a pas été retrouvée. Vérifiez l'id renseigné." });
-        }
-
         // Changement de la photo de l'activité
         const updatingResult = await activityModel.updatePicture(req.body.urlPicture, activityId);
         if (updatingResult.code) {
             return res.status(500).json({ status: 500, msg: "Erreur de modification de la photo.", err: updatingResult });
         }
-
         return res.status(200).json({ status: 200, msg: "La photo a bien été modifiée. Votre activité est désormais en attente de validation par l'administration." });
-
     } catch (error) {
         console.error("Erreur lors de la modification de la photo :", error);
         return res.status(500).json({ status: 500, msg: "Erreur lors de la modification de la photo.", err: error.message });
     }
   });
-
-}
+};
