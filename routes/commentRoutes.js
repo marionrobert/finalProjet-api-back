@@ -256,8 +256,8 @@ module.exports = (app,db) => {
               // envoi du mail à l'auteur du commmentaire pour le prévenir que le commentaire a été validé
               mail(
                 user[0].email,
-                `Validation de votre commentaire pour la réservation n°${comment[0].booking_id}`,
-                `Validation de votre commentaire pour la réservation n°${comment[0].booking_id}`,
+                `Validation de votre commentaire pour la réservation n°${req.comment[0].booking_id}`,
+                `Validation de votre commentaire pour la réservation n°${req.comment[0].booking_id}`,
                 `Le commentaire que vous avez laissé a été validé par l'administration. Il est désormais en ligne.\n Le service Harmony`
               )
             //  succès: le commentaire a bie été validé
@@ -266,8 +266,8 @@ module.exports = (app,db) => {
               // envoi du mail à l'auteur du commmentaire pour le prévenir que le commentaire n'a pas été validé
               mail(
                 user[0].email,
-                `Invalidation de votre commentaire pour la réservation n°${comment[0].booking_id}`,
-                `Invalidation de votre commentaire pour la réservation n°${comment[0].booking_id}`,
+                `Invalidation de votre commentaire pour la réservation n°${req.comment[0].booking_id}`,
+                `Invalidation de votre commentaire pour la réservation n°${req.comment[0].booking_id}`,
                 `Le commentaire que vous avez laissé n'a pas été validé par l'administration pour le motif suivant: « ${req.body.explanation} ». Vous pouvez modifier votre commentaire en prenant en compte cette remarque.\n Le service Harmony`
               )
               // succès: le commentaire a bien été invalidé
