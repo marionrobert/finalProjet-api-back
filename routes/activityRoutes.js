@@ -126,7 +126,7 @@ module.exports = (app, db) => {
 
   //route de récupération d'une activité - route protégée
   app.get("/api/v1/activity/:id", withAuth, isValidId, activityExists, (req, res, next) => {
-    return res.status(200).json({ status: 200, msg: "L'activité a bien été trouvée.", activity: req.activity });
+    return res.status(200).json({ status: 200, msg: "L'activité a bien été trouvée.", activity: req.activity[0] });
   });
 
   //routes de création d'une activité - route protégée
