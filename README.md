@@ -14,6 +14,11 @@ Il s'agit d'un projet éducatif développé en tant que projet final de la forma
 
 <br/>
 
+## Documentation sur Postman 🔗
+Retrouvez [ici](https://documenter.getpostman.com/view/20632735/2sA3QtdAjy) la documentation de l'API publiée sur Postman
+
+<br/>
+
 ## Installation et Configuration ⚙️🛠️
 
 ### Prérequis système :
@@ -105,8 +110,17 @@ Harmony was born from a simple observation. People with international protection
 
 This repository is dedicated to the **backend part** of the project.
 
+<br/>
+
 ## Development Context 💻
 This is an educational project developed as the final project of the "FullStack Javascript Web Developer" training at 3w Academy.
+
+<br/>
+
+## Postman documentation 🔗
+Find [here](https://documenter.getpostman.com/view/20632735/2sA3QtdAjy) the API documentation published on Postman
+
+<br/>
 
 ## Installation and Configuration ⚙️🛠️
 
