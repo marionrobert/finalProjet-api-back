@@ -78,7 +78,7 @@ module.exports = (app, db)=>{
 
         // Vérifier si la réservation a été trouvée
         if (bookingAfterValidation.length === 0) {
-            return res.json({ status: 404, msg: "Aucune réservation ne correspond à cet id.", booking: bookingAfterValidation });
+            return res.json({ status: 404, msg: "Aucune réservation ne correspond à cet id." });
         }
 
         // Vérifier si les deux utilisateurs ont validé la réalisation
@@ -188,7 +188,7 @@ module.exports = (app, db)=>{
 
   // route de récupération d'une réservation par son id - route protégée
   app.get("/api/v1/booking/one/:id", withAuth, isValidId, bookingExists, async(req, res, next)=>{
-    return res.status(200).json({ status: 200, msg: "La réservation a bien été trouvée.", booking: req.booking });
+    return res.status(200).json({ status: 200, msg: "La réservation a bien été trouvée.", booking: req.booking[0] });
   });
 
   // route de création d'une réservation - route protégée
