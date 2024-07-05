@@ -119,9 +119,9 @@ module.exports = (app, db) => {
         res.json({status: 404, msg:"Il n'existe pas d'utilisateur avec cet email."})
       } else {
         //optionnel : on change le key_id (sécurité supplémentaire)
-        console.log("je vais changer le key_id")
+        // console.log("change key_id")
         let new_key_id = await userModel.updateKeyId(req.body.email)
-        console.log("resultat de la requête await userModel.updateKeyId(req.body.email) -->", new_key_id)
+        // console.log("resultat de la requête await userModel.updateKeyId(req.body.email) -->", new_key_id)
         if (new_key_id.code){
           res.json({status: 500, msg: "Erreur dans le changement du key_id"})
         } else {
@@ -177,7 +177,7 @@ module.exports = (app, db) => {
     if (user.code){
       res.json({status: 500, msg: "L'utilisateur n'a pas été retrouvé."})
     } else {
-      console.log("user -->", user)
+      // console.log("user -->", user)
       if (user.length > 0){
         let result = await userModel.updateUser(req, req.params.key_id)
         if (result.code){
@@ -198,13 +198,13 @@ module.exports = (app, db) => {
 
   // route de modification de la photo de profil
   app.put("/api/v1/user/update-avatar/:key_id", withAuth, async(req, res, next)=>{
-    console.log("req.body.avatar, req.params.key_id -->", req.body.avatar, req.params.key_id)
+    // console.log("req.body.avatar, req.params.key_id -->", req.body.avatar, req.params.key_id)
     let changeAvatar = await userModel.updateAvatar(req.body.avatar, req.params.key_id)
     if (changeAvatar.code){
       res.json({status: 500, msg: "Erreur de modification de l'image de profil.", err: changeAvatar})
     } else {
       let user = await userModel.getOneUserByKeyId(req.params.key_id)
-      console.log("user -->", user)
+      // console.log("user -->", user)
       if (user.code){
         res.json({status: 500, msg: "Erreur de récupération de l'utilisateur", err: user})
       } else {

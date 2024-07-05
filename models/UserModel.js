@@ -31,7 +31,7 @@ class UserModel {
         return res;
       })
       .catch((error)=>{
-        console.log("erreur requête sql saveOneUser" + err)
+        // console.log("erreur requête sql saveOneUser" + err)
         return error;
       })
     })
@@ -55,7 +55,7 @@ class UserModel {
             }
             isUnique = true;
         } catch (error) {
-            console.error("Erreur lors de la vérification de l'unicité du key_id:", error);
+            // console.error("Erreur lors de la vérification de l'unicité du key_id:", error);
             // Sortir de la boucle et gérer l'erreur ici (peut-être générer une nouvelle erreur ou relancer la génération, selon le cas)
             throw new Error("Erreur lors de la vérification de l'unicité du key_id");
         }
@@ -73,7 +73,7 @@ class UserModel {
         return res
       })
       .catch((err)=>{
-        console.log("erreur requête sql validateAccount" + err)
+        // console.log("erreur requête sql validateAccount" + err)
         return err
       })
 	}
@@ -88,7 +88,7 @@ class UserModel {
         return res
       })
       .catch((err)=>{
-        console.log("erreur requête sql updateKeyId" + err)
+        // console.log("erreur requête sql updateKeyId" + err)
         return err
       })
 	}
@@ -105,7 +105,7 @@ class UserModel {
         return res
       })
       .catch((err)=>{
-        console.log("erreur requête sql updatepassword" + err)
+        // console.log("erreur requête sql updatepassword" + err)
         return err
       })
     })
@@ -156,7 +156,8 @@ class UserModel {
       return res
     })
     .catch((err)=>{
-      console.log(err)
+      // console.log(err)
+      return err;
     })
   }
 
@@ -168,7 +169,7 @@ class UserModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de requête sql updateAvatar -->", err)
+      // console.log("err de requête sql updateAvatar -->", err)
       return err
     })
   }
@@ -181,7 +182,7 @@ class UserModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de requête sql increasePoints -->", err)
+      // console.log("err de requête sql increasePoints -->", err)
       return err
     })
   }
@@ -194,7 +195,7 @@ class UserModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de requête sql decreasePoints -->", err)
+      // console.log("err de requête sql decreasePoints -->", err)
       return err
     })
   }

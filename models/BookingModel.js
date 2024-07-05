@@ -13,7 +13,7 @@ class BookingModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql getAllBookings -->", err)
+      // console.log("err de la requête sql getAllBookings -->", err)
       return err
     })
   }
@@ -27,7 +27,7 @@ class BookingModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql getAllBookingsByAuthorId -->", err)
+      // console.log("err de la requête sql getAllBookingsByAuthorId -->", err)
       return err
     })
 
@@ -41,7 +41,7 @@ class BookingModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql getAllBookingsByBookerId -->", err)
+      // console.log("err de la requête sql getAllBookingsByBookerId -->", err)
       return err
     })
   }
@@ -55,7 +55,7 @@ class BookingModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql getOneBooking -->", err)
+      // console.log("err de la requête sql getOneBooking -->", err)
       return err
     })
   }
@@ -69,7 +69,7 @@ class BookingModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql saveOneBooking -->", err)
+      // console.log("err de la requête sql saveOneBooking -->", err)
       return err
     })
   }
@@ -82,7 +82,7 @@ class BookingModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql updateStatus -->", err)
+      // console.log("err de la requête sql updateStatus -->", err)
       return err
     })
   }
@@ -95,7 +95,7 @@ class BookingModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql validateAchievementByProvider -->", err)
+      // console.log("err de la requête sql validateAchievementByProvider -->", err)
       return err
     })
   }
@@ -108,7 +108,7 @@ class BookingModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql validateAchievementByBeneficiary -->", err)
+      // console.log("err de la requête sql validateAchievementByBeneficiary -->", err)
       return err
     })
   }
@@ -121,7 +121,7 @@ class BookingModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql deleteOneBooking -->", err)
+      // console.log("err de la requête sql deleteOneBooking -->", err)
       return err
     })
   }

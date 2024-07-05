@@ -48,7 +48,7 @@ module.exports = (app, db) => {
 
   // route de récupération d'une catégorie par son titre - route admin
   app.post("/api/v1/category/one/title", adminAuth, async(req,res,next)=>{
-    console.log("hello from /api/v1/category/one/title route ")
+    // console.log("hello from /api/v1/category/one/title route ")
     let category = await categoryModel.getOneCategoryByTitle(req.body.title)
     if (category.code){
       // erreur
