@@ -225,7 +225,7 @@ module.exports = (app, db)=>{
                   res.json({status: 500, msg: "Erreur de création de la réservation.", err: booking})
                 } else {
                   // succès : la réservation a eu lieu
-                  res.json({status: 200, msg: `La réservation a bien été créée. Votre solde a été débité de ${req.body.points} points.`})
+                  res.json({status: 200, msg: `La réservation a bien été créée. Votre solde a été débité de ${req.body.points} points.`, booking: booking})
                 }
               }
           }
