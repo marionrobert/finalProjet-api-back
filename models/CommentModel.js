@@ -13,7 +13,7 @@ class CommentModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql getAllComments -->", err)
+      // console.log("err de la requête sql getAllComments -->", err)
       return err
     })
   }
@@ -26,7 +26,7 @@ class CommentModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql getAllWaitingComments -->", err)
+      // console.log("err de la requête sql getAllWaitingComments -->", err)
       return err
     })
   }
@@ -39,7 +39,7 @@ class CommentModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql getOneCommentById -->", err)
+      // console.log("err de la requête sql getOneCommentById -->", err)
       return err
     })
   }
@@ -52,7 +52,7 @@ class CommentModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql getOneCommentByBookingId -->", err)
+      // console.log("err de la requête sql getOneCommentByBookingId -->", err)
       return err
     })
   }
@@ -65,7 +65,7 @@ class CommentModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql getAllCommentsByActivityId -->", err)
+      // console.log("err de la requête sql getAllCommentsByActivityId -->", err)
       return err
     })
   }
@@ -78,7 +78,7 @@ class CommentModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql getAllHighScoreComments -->", err)
+      // console.log("err de la requête sql getAllHighScoreComments -->", err)
       return err
     })
   }
@@ -91,7 +91,7 @@ class CommentModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql getAllCommentsByAuthorId -->", err)
+      // console.log("err de la requête sql getAllCommentsByAuthorId -->", err)
       return err
     })
   }
@@ -101,11 +101,11 @@ class CommentModel {
     let sql = "INSERT INTO comments (title, content, author_id, activity_id, booking_id, creationTimestamp, score) VALUES (?,?,?,?,?,?,?)"
     return db.query(sql, [req.body.title, req.body.content, req.body.author_id, req.body.activity_id, req.body.booking_id, new Date(), req.body.score])
     .then((res)=>{
-      console.log("res de la requête sql saveOneComment -->", res)
+      // console.log("res de la requête sql saveOneComment -->", res)
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql saveOneComment -->", err)
+      // console.log("err de la requête sql saveOneComment -->", err)
       return err
     })
   }
@@ -115,11 +115,11 @@ class CommentModel {
     let sql = "UPDATE comments SET title=?, content=?, status=?, score=? WHERE id=?"
     return db.query(sql, [req.body.title, req.body.content, "waiting_for_validation", req.body.score, id])
     .then((res)=>{
-      console.log("res de la requête sql updateOneComent -->", res)
+      // console.log("res de la requête sql updateOneComent -->", res)
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql updateOneComent -->", err)
+      // console.log("err de la requête sql updateOneComent -->", err)
       return err
     })
   }
@@ -128,11 +128,11 @@ class CommentModel {
   static async moderateComment(req, id){
     return db.query("UPDATE comments SET status=? WHERE id=?", [req.body.status, id])
     .then((res)=>{
-      console.log("res de la requête sql validateComment -->", res)
+      // console.log("res de la requête sql validateComment -->", res)
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql validateComment -->", err)
+      // console.log("err de la requête sql validateComment -->", err)
       return err
     })
   }
@@ -141,11 +141,11 @@ class CommentModel {
   static async deleteOneComment(id){
     return db.query("DELETE FROM comments WHERE id=?", [id])
     .then((res)=>{
-      console.log("res de la requête sql deleteOneComment -->", res)
+      // console.log("res de la requête sql deleteOneComment -->", res)
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql deleteOneComment -->", err)
+      // console.log("err de la requête sql deleteOneComment -->", err)
       return err
     })
   }

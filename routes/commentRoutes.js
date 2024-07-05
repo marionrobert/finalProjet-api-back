@@ -18,7 +18,7 @@ module.exports = (app,db) => {
 
   // Middleware to check if comment exists
   async function commentExists(req, res, next) {
-    console.log("in commentExists")
+    // console.log("in commentExists")
     const commentId = req.params.id;
     try {
         const comment = await commentModel.getOneCommentById(commentId);
@@ -30,7 +30,7 @@ module.exports = (app,db) => {
         req.comment = comment; // Pass the comment to the next middleware
         next();
     } catch (error) {
-        console.error("Erreur lors de la vérification de l'existence du commentaire :", error);
+        // console.error("Erreur lors de la vérification de l'existence du commentaire :", error);
         return res.status(500).json({ status: 500, msg: "Erreur lors de la vérification de l'existence du commentaire.", err: error.message });
     }
   }
@@ -88,7 +88,7 @@ module.exports = (app,db) => {
         }
       }
     } catch (error) {
-      console.log("Erreur de récupération du commentaire. -->", error)
+      // console.log("Erreur de récupération du commentaire. -->", error)
       res.status(500).json({status: 500, msg: "Erreur de récupération du commentaire.", err: error.message})
     }
   })
@@ -109,7 +109,7 @@ module.exports = (app,db) => {
         }
       }
     } catch (error) {
-      console.log("Erreur de récupération des commentaires validés liés à cette activité. -->", error)
+      // console.log("Erreur de récupération des commentaires validés liés à cette activité. -->", error)
       res.status(500).json({status: 500, msg: "Erreur de récupération des commentaires validés liés à cette activité.", err: comment})
     }
   })
@@ -130,7 +130,7 @@ module.exports = (app,db) => {
         }
       }
     } catch (error) {
-      console.log("Erreur de récupération des commentaires validés avec un score élevé. -->", error)
+      // console.log("Erreur de récupération des commentaires validés avec un score élevé. -->", error)
       res.status(500).json({status: 500, msg: "Erreur de récupération des commentaires validés avec un score élevé.", err: error.message})
     }
   })
@@ -151,7 +151,7 @@ module.exports = (app,db) => {
         }
       }
     } catch (error) {
-      console.log("Erreur de récupération des commentaires liés à l'utilisateur. -->", error)
+      // console.log("Erreur de récupération des commentaires liés à l'utilisateur. -->", error)
       res.status(500).json({status: 500, msg: "Erreur de récupération des commentaires liés à l'utilisateur.", err: error.message})
     }
 
@@ -212,7 +212,7 @@ module.exports = (app,db) => {
         }
       }
     } catch (error) {
-      console.log("Erreur lors de la mise à jour d'un commentaire. -->", error)
+      // console.log("Erreur lors de la mise à jour d'un commentaire. -->", error)
       res.status(500).json({status: 500, msg: "Erreur lors de la mise à jour d'un commentaire.", err: error.message});
     }
   })
@@ -227,14 +227,14 @@ module.exports = (app,db) => {
         res.json({status: 200, msg: "Le commentaire a bien été supprimé."})
       }
     } catch (error) {
-      console.log("Erreur lors de suppression d'un commentaire. -->", error)
+      // console.log("Erreur lors de suppression d'un commentaire. -->", error)
       res.status(500).json({status: 500, msg: "Erreur lors de suppression d'un commentaire.", err: error.message});
     }
   })
 
   //route de validation du commentaire - route admin
   app.put("/api/v1/comment/moderate/:id", adminAuth, isValidId, commentExists, async(req, res, next)=>{
-    console.log("req.comment -->", req.comment)
+    // console.log("req.comment -->", req.comment)
     try {
       // modération : changement de statut du commentaire
       let resultModeration = await commentModel.moderateComment(req, req.params.id)
@@ -277,7 +277,7 @@ module.exports = (app,db) => {
         }
       }
     } catch (error) {
-      console.log("Erreur lors de modération d'un commentaire. -->", error)
+      // console.log("Erreur lors de modération d'un commentaire. -->", error)
       res.status(500).json({status: 500, msg: "Erreur lors de modération d'un commentaire.", err: error.message});
     }
 

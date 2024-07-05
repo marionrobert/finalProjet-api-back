@@ -13,21 +13,20 @@ class ActivityModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql getAllActivities -->", err)
+      // console.log("err de la requête sql getAllActivities -->", err)
       return err
     })
   }
 
   //récupération de toutes les activités "en ligne"
   static async getAllOnlineActivities(){
-    console.log("hello from getAllOnelineActivities")
     return db.query("SELECT * FROM activities WHERE status=? ORDER BY updatingTimestamps DESC", ["online"])
     .then((res)=>{
       // console.log("res de la requête sql getAllOnlineActivities -->", res)
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql getAllOnlineActivities -->", err)
+      // console.log("err de la requête sql getAllOnlineActivities -->", err)
       return err
     })
   }
@@ -40,7 +39,7 @@ class ActivityModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql getAllWaitingActivities -->", err)
+      // console.log("err de la requête sql getAllWaitingActivities -->", err)
       return err
     })
   }
@@ -53,7 +52,7 @@ class ActivityModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql getAllActivitiesByUser -->", err)
+      // console.log("err de la requête sql getAllActivitiesByUser -->", err)
       return err
     })
   }
@@ -66,7 +65,7 @@ class ActivityModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql getAllActivitiesByAuthorIsProvider -->", err)
+      // console.log("err de la requête sql getAllActivitiesByAuthorIsProvider -->", err)
       return err
     })
   }
@@ -75,11 +74,11 @@ class ActivityModel {
   static async getOneActivity(id){
     return db.query("SELECT * FROM activities WHERE id=?", [id])
     .then((res)=>{
-      console.log("res de la requête sql getOneActivity -->", res)
+      // console.log("res de la requête sql getOneActivity -->", res)
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql getOneActivity -->", err)
+      // console.log("err de la requête sql getOneActivity -->", err)
       return err
     })
   }
@@ -89,11 +88,11 @@ class ActivityModel {
     let sql = "INSERT INTO activities (category_id, author_id, authorIsProvider, title, description, address, zip, city, lat, lng, status, duration, points, urlPicture, creationTimestamps, updatingTimestamps) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?, ?, Now(), Now())"
     return db.query(sql, [req.body.category_id, req.body.author_id, req.body.authorIsProvider, req.body.title, req.body.description, req.body.address, req.body.zip, req.body.city, req.body.lat, req.body.lng, "waiting_for_validation", req.body.duration, req.body.points, req.body.urlPicture])
     .then((res)=>{
-      console.log("res de la requête sql saveOneActivity -->", res)
+      // console.log("res de la requête sql saveOneActivity -->", res)
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql saveOneActivity -->", err)
+      // console.log("err de la requête sql saveOneActivity -->", err)
       return err
     })
   }
@@ -103,11 +102,11 @@ class ActivityModel {
     let sql = "UPDATE activities SET category_id=?, authorIsProvider=?, title=?, description=?, address=?, zip=?, city=?, lat=?, lng=?, status=?, duration=?, points=?, urlPicture=?, updatingTimestamps=? WHERE id=?"
     return db.query(sql, [req.body.category_id, req.body.authorIsProvider, req.body.title, req.body.description, req.body.address, req.body.zip, req.body.city, req.body.lat, req.body.lng, "waiting_for_validation", req.body.duration, req.body.points, req.body.urlPicture, new Date(), id])
     .then((res)=>{
-      console.log("res de la requête sql updateOneActivity -->", res)
+      // console.log("res de la requête sql updateOneActivity -->", res)
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql updateOneActivity -->", err)
+      // console.log("err de la requête sql updateOneActivity -->", err)
       return err
     })
   }
@@ -116,11 +115,11 @@ class ActivityModel {
   static async updateOnlineOfflineStatus(req, id){
     return db.query("UPDATE activities SET status=? WHERE id=?", [req.body.status, id])
     .then((res)=>{
-      console.log("res de la requête sql updateOnlineOfflineStatus -->", res)
+      // console.log("res de la requête sql updateOnlineOfflineStatus -->", res)
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql updateOnlineOfflineStatus -->", err)
+      // console.log("err de la requête sql updateOnlineOfflineStatus -->", err)
       return err
     })
   }
@@ -129,11 +128,11 @@ class ActivityModel {
   static async moderateOneActivity(req, id){
     return db.query("UPDATE activities SET status=? WHERE id=?", [req.body.status, id])
     .then((res)=>{
-      console.log("res de la requête sql moderateOneActivity -->", res)
+      // console.log("res de la requête sql moderateOneActivity -->", res)
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql moderateOneActivity -->", err)
+      // console.log("err de la requête sql moderateOneActivity -->", err)
       return err
     })
   }
@@ -142,11 +141,11 @@ class ActivityModel {
   static async deleteOneActivity(id){
     return db.query("DELETE FROM activities WHERE id=?", [id])
     .then((res)=>{
-      console.log("res de la requête sql deleteOneActivity -->", res)
+      // console.log("res de la requête sql deleteOneActivity -->", res)
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql deleteOneActivity -->", err)
+      // console.log("err de la requête sql deleteOneActivity -->", err)
       return err
     })
   }
@@ -154,7 +153,6 @@ class ActivityModel {
   // filter les activités
   static async getActivitiesByFilter(req){
     let condition = " WHERE status='online'"
-    console.log("req.body dans getActivitiesByFilter -->", req.body)
     // FORMAT DE LA REQUETE SQl A OBTENIR : SELECT * FROM activities WHERE status = 'online' AND authorIsProvider = true/false AND category_id IN (2, 3, 7, 9) AND points BETWEEN min_points AND max_points AND duration BETWEEN min_duration AND max_duration;
 
     //si l'utilisateur a choisi des catégories -- format d'un array contenant les id des catégories choisies
@@ -214,11 +212,11 @@ class ActivityModel {
   static async updateActivitiesCategory(old_category_id, new_category_id){
     return db.query("UPDATE activities SET category_id = ? WHERE category_id = ?", [new_category_id, old_category_id])
     .then((res)=>{
-      console.log("res de la requête sql updateCategory -->", res)
+      // console.log("res de la requête sql updateCategory -->", res)
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql updateCategory -->", err)
+      // console.log("err de la requête sql updateCategory -->", err)
       return err
     })
   }
@@ -227,11 +225,11 @@ class ActivityModel {
   static async updatePicture(picture, id){
     return db.query("UPDATE activities SET urlPicture = ?, status=? WHERE id = ?", [picture, "waiting_for_validation", id])
     .then((res)=>{
-      console.log("res de requête sql updatePicture -->", res)
+      // console.log("res de requête sql updatePicture -->", res)
       return res
     })
     .catch((err)=>{
-      console.log("err de requête sql updatePicture -->", err)
+      // console.log("err de requête sql updatePicture -->", err)
       return err
     })
   }

@@ -13,7 +13,7 @@ class CategoryModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql getAllCategories -->", err)
+      // console.log("err de la requête sql getAllCategories -->", err)
       return err
     })
   }
@@ -26,7 +26,7 @@ class CategoryModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql getOneCategory -->", err)
+      // console.log("err de la requête sql getOneCategory -->", err)
       return err
     })
   }
@@ -39,7 +39,7 @@ class CategoryModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql getOneCategoryByTitle -->", err)
+      // console.log("err de la requête sql getOneCategoryByTitle -->", err)
       return err
     })
   }
@@ -53,7 +53,7 @@ class CategoryModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql saveOneCategory -->", err)
+      // console.log("err de la requête sql saveOneCategory -->", err)
       return err
     })
   }
@@ -66,7 +66,7 @@ class CategoryModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql updateOneCategory -->", err)
+      // console.log("err de la requête sql updateOneCategory -->", err)
       return err
     })
   }
@@ -79,7 +79,7 @@ class CategoryModel {
       return res
     })
     .catch((err)=>{
-      console.log("err de la requête sql deleteOneCategory -->", err)
+      // console.log("err de la requête sql deleteOneCategory -->", err)
       return err
     })
   }
